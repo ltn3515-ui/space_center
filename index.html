@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KARI | 한국항공우주연구원 - NEXT HORIZON</title>
+  <meta name="description" content="한국항공우주연구원(KARI)의 우주 수송, 위성, 항공 및 미래 우주 탐사를 다룬 프리미엄 리뉴얼 홈페이지">
+  
+  <!-- Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,500;0,700;1,300&family=Syncopate:wght@700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Preloads for Large Slide Images -->
+  <link rel="preload" href="img/satellite06.jpg" as="image">
+  <link rel="preload" href="img/satellite02.jpg" as="image">
+  <link rel="preload" href="img/setellite04.jpg" as="image">
+</head>
+<body>
+
+  <!-- WebGL Canvas Container -->
+  <div id="webgl-container"></div>
+
+  <!-- Video Cache for WebGL Slide Backgrounds (오프스크린 렌더링 유지) -->
+  <div class="offscreen-video-cache" aria-hidden="true">
+    <video id="video-slide-1" src="img/satellite04.mp4" autoplay loop muted playsinline crossorigin="anonymous"></video>
+    <video id="video-slide-2" src="img/Dron01.mp4" autoplay loop muted playsinline></video>
+    <video id="video-slide-3" src="img/satellite02.mp4" autoplay loop muted playsinline crossorigin="anonymous"></video>
+    <video id="video-slide-4" src="img/satellite_space.mp4" autoplay loop muted playsinline></video>
+  </div>
+
+  <!-- TOP NAVIGATION SYSTEM (KARI Official Top Bar & Main Header) -->
+  <div class="top-navigation-wrapper">
+    <!-- 1. SNS Top Utility Bar -->
+    <div class="header-top-bar">
+      <div class="top-bar-inner">
+        <div class="sns-links">
+          <a href="https://www.youtube.com/user/karimedia" target="_blank" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+          </a>
+          <a href="https://www.instagram.com/karispace" target="_blank" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://www.facebook.com/karipr" target="_blank" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+          </a>
+          <a href="https://blog.naver.com/karipr" target="_blank" aria-label="Naver Blog" class="naver-blog-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3.5 12.5c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm-5 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zM12 9c-1.7 0-3 1.3-3 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Main Navigation Header -->
+    <header class="hud-top">
+      <div class="brand-group">
+        <!-- KARI Logo SVG representation -->
+        <a href="https://www.kari.re.kr/kor" class="logo-link" aria-label="KARI 홈페이지">
+          <svg class="kari-logo-svg" viewBox="0 0 350 45" width="280" height="36" fill="currentColor">
+            <!-- KARI Symbol Orbit & Wings -->
+            <path d="M12 22 C 15 12, 28 8, 38 15 C 32 18, 20 22, 16 32 Z" fill="#00F5D4"/>
+            <path d="M16 26 C 24 24, 38 28, 42 35 C 32 32, 22 28, 12 30 Z" fill="#38BDF8"/>
+            <circle cx="26" cy="22" r="6" fill="#ffffff" opacity="0.9"/>
+            <!-- KARI Text (English & Korean emblem style) -->
+            <text x="56" y="22" font-family="'Outfit', sans-serif" font-size="20" font-weight="800" fill="#ffffff" letter-spacing="1">KARI</text>
+            <text x="56" y="34" font-family="'Pretendard', sans-serif" font-size="8" font-weight="400" fill="rgba(255,255,255,0.6)" letter-spacing="0.5">한국항공우주연구원</text>
+          </svg>
+        </a>
+      </div>
+
+    <!-- Main Navigation Menu (Mega Dropdown Trigger Targets) -->
+    <nav class="hud-nav-menu">
+      <ul class="nav-list">
+        <li><a href="https://www.kari.re.kr/kor/contents/90" target="_blank" class="nav-item" data-mega="0">KARI 소개</a></li>
+        <li><a href="https://www.kari.re.kr/kor/contents/208" target="_blank" class="nav-item" data-mega="1">연구개발</a></li>
+        <li><a href="https://www.kari.re.kr/kor/35/news" target="_blank" class="nav-item" data-mega="2">뉴스룸</a></li>
+        <li><a href="https://www.kari.re.kr/kor/105/kariPlus/kariTv" target="_blank" class="nav-item" data-mega="3">KARI+</a></li>
+        <li><a href="https://www.kari.re.kr/kor/contents/112" target="_blank" class="nav-item" data-mega="4">기술사업화</a></li>
+        <li><a href="https://www.kari.re.kr/kor/contents/241" target="_blank" class="nav-item" data-mega="5">OPEN KARI</a></li>
+        <li><a href="https://www.kari.re.kr/vrshowroom/index.html" target="_blank" class="nav-item" data-mega="6">우주과학관</a></li>
+      </ul>
+    </nav>
+    
+    <!-- Header Utilities -->
+    <div class="header-actions">
+      <a href="https://www.kari.re.kr/kor/sub/login" target="_blank" class="util-link">LOGIN</a>
+      <span class="util-sep">|</span>
+      <a href="https://www.kari.re.kr/eng" target="_blank" class="util-link">ENG</a>
+      <span class="util-sep">|</span>
+      <button class="btn-ai-assist" aria-label="AI Assistant">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 2a10 10 0 0 1 7.54 16.59c-.24.28-.34.66-.27 1.03l.36 1.89c.07.38-.27.72-.65.65l-1.89-.36c-.37-.07-.75.03-1.03.27A10 10 0 1 1 12 2z"/></svg>
+        <span>AI</span>
+      </button>
+      <button class="util-icon-btn" aria-label="검색">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+      <button class="menu-trigger" id="menu-trigger" aria-label="Open Menu">
+        <span class="menu-icon-dots"></span>
+      </button>
+    </div>
+
+    <!-- KARI Mega Dropdown Panel (Hover Slidedown) -->
+    <div class="mega-dropdown-panel" id="mega-panel">
+      <div class="mega-inner">
+        <!-- Left Banner Area (Emblem and Title) -->
+        <div class="mega-left">
+          <div class="mega-bg-emblem"></div>
+          <h2 class="mega-title" id="mega-display-title">KARI 소개</h2>
+        </div>
+        
+        <!-- Right Multi-Column Lists -->
+        <div class="mega-right">
+          <!-- Category 0: KARI 소개 -->
+          <div class="mega-content" data-mega-content="0">
+            <div class="mega-col">
+              <h4><a href="https://www.kari.re.kr/kor/contents/90" target="_blank">인사말</a></h4>
+            </div>
+            <div class="mega-col">
+              <h4>일반현황</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/91" target="_blank">설립목적 및 기능</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/105" target="_blank">연혁</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/92" target="_blank">CI 소개</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/5" target="_blank">찾아오시는 길</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>조직안내</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/103" target="_blank">조직도</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/104" target="_blank">직원검색</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>지속가능경영</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/238" target="_blank">추진체계</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/93" target="_blank">추진조직</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/240" target="_blank">지속가능경영보고서</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>윤리경영</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/237" target="_blank">윤리헌장</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/239" target="_blank">수의계약 현황</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/242" target="_blank">부패징계 현황</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/243" target="_blank">윤리위반 신고센터</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/244" target="_blank">반부패·청렴</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/245" target="_blank">청렴정보공개</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4><a href="https://www.kari.re.kr/kor/contents/94" target="_blank">안전보건경영방침</a></h4>
+            </div>
+          </div>
+          
+          <!-- Category 1: 연구개발 -->
+          <div class="mega-content" data-mega-content="1">
+            <div class="mega-col">
+              <h4>R&D 연구분야</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/208" target="_blank">항공기술 / AAM</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/32" target="_blank">인공위성 개요</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/95" target="_blank">우주발사체 개요</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/62" target="_blank">국가위성정보활용</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/65" target="_blank">우주탐사</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/72" target="_blank">위성항법 / KPS</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>항공 세부 R&D</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/209" target="_blank">AAM 연구단</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/210" target="_blank">친환경 항공 추진</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>위성/발사체 R&D</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/33" target="_blank">다목적 실용위성</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/34" target="_blank">정지궤도 복합위성</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/96" target="_blank">누리호 프로젝트</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/97" target="_blank">나로우주센터 안내</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>우주탐사 R&D</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/66" target="_blank">달 탐사 / 다누리</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/67" target="_blank">화성/소행성 로드맵</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>연구성과</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/75" target="_blank">독립사업단</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/74" target="_blank">연구개발투자성과</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4><a href="https://www.kari.re.kr/kor/contents/153" target="_blank">시험평가 공동활용</a></h4>
+            </div>
+          </div>
+          
+          <!-- Category 2: 뉴스룸 -->
+          <div class="mega-content" data-mega-content="2">
+            <div class="mega-col">
+              <h4>소식 / 알림</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/35/news" target="_blank">공지사항</a></li>
+                <li><a href="https://www.kari.re.kr/kor/article/ATCL87374b48c" target="_blank">보도자료</a></li>
+                <li><a href="https://www.kari.re.kr/kor/article/ATCLd4f64ac47" target="_blank">연구사업공고</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/182" target="_blank">입찰정보</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>홍보 자료</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/90/pblc/SPPLCYRSCH" target="_blank">정책연구보고서</a></li>
+                <li><a href="https://www.kari.re.kr/kor/90/pblc/SNCNDTECH" target="_blank">우주항공기술동향</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4><a href="https://www.kari.re.kr/kor/sub/80" target="_blank">자료실</a></h4>
+            </div>
+          </div>
+          
+          <!-- Category 3: KARI+ -->
+          <div class="mega-content" data-mega-content="3">
+            <div class="mega-col">
+              <h4>미디어 아카이브</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/105/kariPlus/kariTv" target="_blank">KARI TV</a></li>
+                <li><a href="https://www.kari.re.kr/kor/106/kariPlus/kariImg" target="_blank">KARI IMAGE</a></li>
+                <li><a href="https://www.kari.re.kr/vrshowroom/index.html" target="_blank">VR 전시관</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>스페셜 콘텐츠</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/107" target="_blank">웹툰 및 카드뉴스</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/108" target="_blank">어린이 우주교실</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/109" target="_blank">우주용어사전</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Category 4: 기술사업화 -->
+          <div class="mega-content" data-mega-content="4">
+            <div class="mega-col">
+              <h4>기술이전</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/112" target="_blank">기술이전절차</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/116" target="_blank">기술이전 예정기술</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>우수기술</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/113" target="_blank">보유특허 정보</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/117" target="_blank">SMK / E-SMK 검색</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/118" target="_blank">우수기술 동영상</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>중소기업지원</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/114" target="_blank">지원사업 안내</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/119" target="_blank">Open API 이용안내</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/120" target="_blank">온라인 전시회</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/115" target="_blank">지원 공지사항</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Category 5: OPEN KARI -->
+          <div class="mega-content" data-mega-content="5">
+            <div class="mega-col">
+              <h4>정보공개</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/241" target="_blank">정보공개제도 안내</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/242" target="_blank">사전정보공표</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/243" target="_blank">공공데이터개방</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/244" target="_blank">경영공시 / 예산</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>소통 / 민원</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/245" target="_blank">고객헌장</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/246" target="_blank">고객응대서비스 표준</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/247" target="_blank">신고센터</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>견학 / 활용신청</h4>
+              <ul>
+                <li><a href="https://www.kari.re.kr/kor/contents/162" target="_blank">견학신청 안내</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/163" target="_blank">견학신청 조회</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/153" target="_blank">공동활용시험장 신청</a></li>
+                <li><a href="https://www.kari.re.kr/kor/contents/95" target="_blank">나로우주센터 사용신청</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Category 6: 우주과학관 -->
+          <div class="mega-content" data-mega-content="6">
+            <div class="mega-col">
+              <h4>관람안내</h4>
+              <ul>
+                <li><a href="https://www.narospacecenter.kr/sub01/sub01.txt" target="_blank">관람시간 및 요금</a></li>
+                <li><a href="https://www.narospacecenter.kr/sub01/sub02.txt" target="_blank">오시는 길</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>전시시설 안내</h4>
+              <ul>
+                <li><a href="https://www.narospacecenter.kr/sub03/sub01.txt" target="_blank">상설전시관</a></li>
+                <li><a href="https://www.narospacecenter.kr/sub03/sub02.txt" target="_blank">기획전시관</a></li>
+                <li><a href="https://www.narospacecenter.kr/sub03/sub03.txt" target="_blank">야외전시관</a></li>
+                <li><a href="https://www.narospacecenter.kr/sub03/sub04.txt" target="_blank">3D/4D 돔영상관</a></li>
+              </ul>
+            </div>
+            <div class="mega-col">
+              <h4>교육 / 행사</h4>
+              <ul>
+                <li><a href="https://www.narospacecenter.kr/sub04/sub01.txt" target="_blank">어린이 우주캠프</a></li>
+                <li><a href="https://www.narospacecenter.kr/sub04/sub02.txt" target="_blank">우주과학 교실</a></li>
+                <li><a href="https://www.narospacecenter.kr/sub04/sub03.txt" target="_blank">과학교육 행사</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Central Project Info (Dynamic Text with Masquerade Slider) -->
+  <div class="center-content">
+    <div class="index-indicator">
+      <span id="curr-num">01</span> <span class="indicator-divider">/</span> <span class="total-num">05</span>
+    </div>
+    <div class="text-mask">
+      <h1 id="project-title">NURI</h1>
+    </div>
+    <div class="text-mask">
+      <p id="project-subtitle">KSLV-II SPACE LAUNCH VEHICLE</p>
+    </div>
+    <div class="text-mask">
+      <span id="project-desc" class="sub-desc">독자 개발 75톤급 액체엔진 클러스터링 기반 우주 수송 플랫폼</span>
+    </div>
+  </div>
+
+  <!-- Bottom HUD Status & Navigation Guide -->
+  <footer class="hud-bottom">
+    <div class="scroll-track">
+      <div class="track-bar">
+        <div class="track-thumb" id="track-thumb"></div>
+      </div>
+      <span class="guide-text">CLICK TO WARP</span>
+    </div>
+    <div class="mission-status" id="mission-status">STATUS: STANDBY ON PAD / READY</div>
+  </footer>
+
+  <!-- FULLSCREEN SITEMAP OVERLAY (Tao Tajima Interactive Menu) -->
+  <div class="sitemap-overlay" id="sitemap-overlay">
+    <div class="sitemap-bg-glow"></div>
+    <button class="menu-close-btn" id="menu-close" aria-label="Close Menu">✕ CLOSE</button>
+    
+    <div class="sitemap-inner">
+      <div class="sitemap-grid">
+        
+        <!-- Category 1 -->
+        <div class="sitemap-col">
+          <div class="col-header">
+            <span class="col-num">01</span>
+            <h3>KARI 소개</h3>
+          </div>
+          <ul class="col-links">
+            <li><a href="https://www.kari.re.kr/kor/contents/90" target="_blank">인사말</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/91" target="_blank">일반현황 및 설립목적</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/105" target="_blank">연혁 및 연구성과</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/92" target="_blank">CI 소개</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/103" target="_blank">조직안내</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/93" target="_blank">추진체계</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/237" target="_blank">윤리경영</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/94" target="_blank">안전보건경영방침</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/5" target="_blank">찾아오시는 길</a></li>
+          </ul>
+        </div>
+
+        <!-- Category 2 -->
+        <div class="sitemap-col">
+          <div class="col-header">
+            <span class="col-num">02</span>
+            <h3>연구개발</h3>
+          </div>
+          <ul class="col-links">
+            <li><a href="https://www.kari.re.kr/kor/contents/208" target="_blank">항공기술 / AAM</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/32" target="_blank">인공위성 개요</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/95" target="_blank">우주발사체 개요</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/62" target="_blank">국가위성정보활용</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/65" target="_blank">우주탐사 / 달착륙선</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/72" target="_blank">위성항법 / KPS</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/75" target="_blank">독립사업단</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/74" target="_blank">연구개발투자성과</a></li>
+          </ul>
+        </div>
+
+        <!-- Category 3 -->
+        <div class="sitemap-col">
+          <div class="col-header">
+            <span class="col-num">03</span>
+            <h3>뉴스룸</h3>
+          </div>
+          <ul class="col-links">
+            <li><a href="https://www.kari.re.kr/kor/35/news" target="_blank">공지사항</a></li>
+            <li><a href="https://www.kari.re.kr/kor/article/ATCL87374b48c" target="_blank">보도자료</a></li>
+            <li><a href="https://www.kari.re.kr/kor/article/ATCLd4f64ac47" target="_blank">연구사업공고</a></li>
+            <li><a href="https://www.kari.re.kr/kor/90/pblc/SPPLCYRSCH" target="_blank">발간물</a></li>
+            <li><a href="https://www.kari.re.kr/kor/sub/80" target="_blank">자료실</a></li>
+          </ul>
+        </div>
+
+        <!-- Category 4 -->
+        <div class="sitemap-col">
+          <div class="col-header">
+            <span class="col-num">04</span>
+            <h3>KARI+</h3>
+          </div>
+          <ul class="col-links">
+            <li><a href="https://www.kari.re.kr/kor/105/kariPlus/kariTv" target="_blank">KARI TV</a></li>
+            <li><a href="https://www.kari.re.kr/kor/106/kariPlus/kariImg" target="_blank">KARI IMAGE</a></li>
+            <li><a href="https://www.kari.re.kr/vrshowroom/index.html" target="_blank">VR 전시관</a></li>
+          </ul>
+        </div>
+
+        <!-- Category 5 -->
+        <div class="sitemap-col">
+          <div class="col-header">
+            <span class="col-num">05</span>
+            <h3>OPEN KARI</h3>
+          </div>
+          <ul class="col-links">
+            <li><a href="https://www.kari.re.kr/kor/contents/82" target="_blank">정보공개</a></li>
+            <li><a href="https://www.kari.re.kr/kor/108/ofanc/list" target="_blank">사전정보공표</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/84" target="_blank">공공데이터개방</a></li>
+            <li><a href="https://www.kari.re.kr/kor/137/pdm/list" target="_blank">경영공시</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/85" target="_blank">고객헌장</a></li>
+            <li><a href="https://www.kari.re.kr/kor/32/rprt/waste/view" target="_blank">예산낭비신고</a></li>
+            <li><a href="https://www.kari.re.kr/kor/34/rprt/cheating/view" target="_blank">연구부정행위신고</a></li>
+          </ul>
+        </div>
+
+        <!-- Category 6 -->
+        <div class="sitemap-col">
+          <div class="col-header">
+            <span class="col-num">06</span>
+            <h3>견학 &amp; 지원</h3>
+          </div>
+          <ul class="col-links">
+            <li><a href="https://www.kari.re.kr/kor/contents/4" target="_blank">견학 안내</a></li>
+            <li><a href="https://www.kari.re.kr/kor/18/trng" target="_blank">견학 신청</a></li>
+            <li><a href="https://kari.applyin.co.kr" target="_blank">인재 채용 (Careers)</a></li>
+            <li><a href="https://www.kari.re.kr/kor/contents/209" target="_blank">국가종합비행성능시험장 신청</a></li>
+            <li><a href="https://www.kari.re.kr/kor/154/naro/view" target="_blank">나로우주센터 사용신청</a></li>
+            <li><a href="https://www.kari.re.kr/kor/153/spcCntr" target="_blank">우주과학관</a></li>
+          </ul>
+        </div>
+
+      </div>
+      
+      <!-- Sitemap Footer Info -->
+      <div class="sitemap-meta-info">
+        <div class="meta-item">
+          <span>LAT 36.3857° N</span> / <span>LON 127.3619° E</span>
+          <span class="meta-label">KARI DAEJEON HQ</span>
+        </div>
+        <div class="meta-item">
+          <span>LAT 34.4326° N</span> / <span>LON 127.5218° E</span>
+          <span class="meta-label">NARO SPACE CENTER</span>
+        </div>
+        <div class="meta-item">
+          <span>LAT 34.6174° N</span> / <span>LON 127.2023° E</span>
+          <span class="meta-label">GOHEUNG AVIATION CENTER</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTAL SECTION (Extended KARI Renewal Hub) -->
+  <section class="portal-section" id="portal-section">
+    <div class="portal-inner">
+      <div class="section-header-wrap">
+        <span class="section-tag">KARI HUB PORTAL</span>
+        <h2>KARI INTERACTIVE PLATFORM</h2>
+        <p class="section-desc">대한민국 항공우주 연구개발 성과와 인프라, 최신 우주 소식을 한눈에 연결합니다.</p>
+      </div>
+
+      <!-- Core Research Fields Grid -->
+      <div class="portal-category-block">
+        <h3 class="category-title">우주항공 핵심 연구개발</h3>
+        <div class="portal-grid research-fields-grid">
+          
+          <a href="https://www.kari.re.kr/kor/contents/208" target="_blank" class="portal-card premium-card">
+            <span class="card-no">01</span>
+            <div class="card-content">
+              <h3>항공 및 미래 비행체 (AAM)</h3>
+              <p>도심항공교통(UAM), 무인기 자율 비행, 고성능 항공엔진 및 친환경 첨단 비행체 연구개발</p>
+            </div>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://www.kari.re.kr/kor/contents/32" target="_blank" class="portal-card premium-card">
+            <span class="card-no">02</span>
+            <div class="card-content">
+              <h3>다목적 실용위성 &amp; 정지궤도</h3>
+              <p>아리랑 다목적 실용위성, 천리안 기상/환경 위성 국산화 개발 및 위성 탑재체 핵심 기술 확보</p>
+            </div>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://www.kari.re.kr/kor/contents/95" target="_blank" class="portal-card premium-card">
+            <span class="card-no">03</span>
+            <div class="card-content">
+              <h3>우주발사체 독자 기술</h3>
+              <p>대한민국 독자 우주 발사 플랫폼 누리호(KSLV-II)의 신뢰성 검증 및 고성능 차세대발사체 설계</p>
+            </div>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://www.kari.re.kr/kor/contents/62" target="_blank" class="portal-card premium-card">
+            <span class="card-no">04</span>
+            <div class="card-content">
+              <h3>국가 위성 정보 활용</h3>
+              <p>다목적 실용위성이 획득한 고해상도 지구 관측 위성 데이터 고정밀 가공 및 공공·민간 서비스 개방</p>
+            </div>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://www.kari.re.kr/kor/contents/65" target="_blank" class="portal-card premium-card">
+            <span class="card-no">05</span>
+            <div class="card-content">
+              <h3>우주 탐사 &amp; 달 궤도선</h3>
+              <p>대한민국 최초의 달 궤도선 '다누리' 운영 및 미래 소행성·달 착륙선 무인 탐사 로드맵 구축</p>
+            </div>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://www.kari.re.kr/kor/contents/72" target="_blank" class="portal-card premium-card">
+            <span class="card-no">06</span>
+            <div class="card-content">
+              <h3>한국형 위성항법시스템 (KPS)</h3>
+              <p>초정밀 위치·항법·시각 정보 서비스를 제공하는 대한민국 자체 위성항법 네트워크(KPS/KASS) 개발</p>
+            </div>
+            <span class="arrow">↗</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Quick Services Hub -->
+      <div class="portal-category-block">
+        <h3 class="category-title">기관 개방 및 국민 지원 서비스</h3>
+        <div class="portal-grid quick-services-grid">
+          
+          <a href="https://www.kari.re.kr/kor/18/trng" target="_blank" class="portal-card icon-card">
+            <div class="icon-header">
+              <span class="card-tag">VISIT</span>
+              <span class="bullet"></span>
+            </div>
+            <h3>기관 견학 신청</h3>
+            <p>나로우주센터 우주과학관 및 대전 본원 국가 연구 시설 단체/개인 견학 온라인 간편 예약</p>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://kari.applyin.co.kr" target="_blank" class="portal-card icon-card">
+            <div class="icon-header">
+              <span class="card-tag">CAREERS</span>
+              <span class="bullet"></span>
+            </div>
+            <h3>정규직·연구직 채용</h3>
+            <p>우주항공 시대를 함께 이끌어갈 글로벌 최고 수준의 연구자 및 핵심 인재 채용 포털</p>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://www.kari.re.kr/kor/contents/84" target="_blank" class="portal-card icon-card">
+            <div class="icon-header">
+              <span class="card-tag">OPEN DATA</span>
+              <span class="bullet"></span>
+            </div>
+            <h3>공공데이터 개방</h3>
+            <p>한국항공우주연구원의 과학기술 정보, 우주 관측 데이터 등 공공 데이터셋 및 OpenAPI 연계</p>
+            <span class="arrow">↗</span>
+          </a>
+
+          <a href="https://www.kari.re.kr/vrshowroom/index.html" target="_blank" class="portal-card icon-card">
+            <div class="icon-header">
+              <span class="card-tag">VR EXHIBITION</span>
+              <span class="bullet"></span>
+            </div>
+            <h3>KARI VR 온라인 과학관</h3>
+            <p>누리호, 다누리 등 주요 성과물을 실제감 넘치는 3D VR 온라인 쇼룸에서 입체적으로 체험</p>
+            <span class="arrow">↗</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- News & Publications Grid -->
+      <div class="portal-category-block">
+        <h3 class="category-title">미디어 &amp; 소식</h3>
+        <div class="portal-grid media-news-grid">
+          
+          <div class="news-list-card">
+            <div class="card-header">
+              <h3>공지 및 보도자료</h3>
+              <a href="https://www.kari.re.kr/kor/35/news" target="_blank" class="btn-more">더보기 +</a>
+            </div>
+            <ul class="news-list">
+              <li>
+                <a href="https://www.kari.re.kr/kor/35/news" target="_blank">
+                  <span class="date">2026.08</span>
+                  <p class="title">누리호 5차 발사 및 차세대발사체 체계종합연구 고도화 추진계획 안내</p>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.kari.re.kr/kor/article/ATCL87374b48c" target="_blank">
+                  <span class="date">2026.08</span>
+                  <p class="title">대한민국 다목적 실용위성 획득 지구 정밀 관측 데이터 개방 플랫폼 고도화 완료</p>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.kari.re.kr/kor/article/ATCLd4f64ac47" target="_blank">
+                  <span class="date">2026.07</span>
+                  <p class="title">2026년도 하반기 KARI 공동 연구사업 신규 과제 공고</p>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="media-video-card">
+            <div class="card-header">
+              <h3>KARI 최신 영상</h3>
+              <a href="https://www.kari.re.kr/kor/105/kariPlus/kariTv" target="_blank" class="btn-more">KARI TV ↗</a>
+            </div>
+            <a href="https://www.kari.re.kr/kor/105/kariPlus/kariTv" target="_blank" class="video-preview-box">
+              <video class="card-video" src="img/satellite05.mp4" autoplay loop muted playsinline></video>
+              <div class="video-glow"></div>
+              <div class="video-overlay">
+                <span class="play-btn">▶</span>
+                <span class="video-title">다누리 달 전이궤도 BLT 진입 성공 및 임무수행 시퀀스</span>
+              </div>
+            </a>
+          </div>
+
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h2>KARI</h2>
+          <p>KOREA AEROSPACE RESEARCH INSTITUTE</p>
+        </div>
+        
+        <ul class="footer-links">
+          <li><a href="https://www.kari.re.kr/kor/contents/98" target="_blank">개인정보처리방침</a></li>
+          <li><a href="https://www.kari.re.kr/kor/contents/238" target="_blank">영상정보운영방침</a></li>
+          <li><a href="https://www.kari.re.kr/kor/contents/101" target="_blank">저작권정책</a></li>
+          <li><a href="https://www.kari.re.kr/kor/contents/100" target="_blank">이메일주소무단수집거부</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-info">
+          <p>본원: (34133) 대전광역시 유성구 과학로 169-84 | 대표전화: 042-860-2114</p>
+          <p>나로우주센터: (59569) 전라남도 고흥군 봉래면 우주로 1321 | 고흥항공센터: (59520) 전라남도 고흥군 고흥읍 항공센터길 15</p>
+          <p class="copyright">© 2026 Korea Aerospace Research Institute. All Rights Reserved.</p>
+        </div>
+
+        <div class="footer-controls">
+          <div class="family-site-wrap">
+            <select class="family-site-select" onchange="if(this.value) window.open(this.value, '_blank');">
+              <option value="">FAMILY SITES</option>
+              <option value="https://www.kasa.go.kr/">우주항공청 (KASA)</option>
+              <option value="https://www.msit.go.kr/">과학기술정보통신부</option>
+              <option value="https://www.kari.re.kr/vrshowroom/index.html">우주과학관 VR전시</option>
+              <option value="https://www.kari.re.kr/e-bid/">입찰정보/검사예약</option>
+            </select>
+          </div>
+          
+          <div class="sns-group">
+            <a href="https://www.youtube.com/user/KARItelevision" target="_blank" aria-label="YouTube">YT</a>
+            <a href="https://www.instagram.com/karistory_kari/" target="_blank" aria-label="Instagram">IG</a>
+            <a href="https://www.facebook.com/karipr" target="_blank" aria-label="Facebook">FB</a>
+            <a href="https://blog.naver.com/karipr" target="_blank" aria-label="Blog">BLOG</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
