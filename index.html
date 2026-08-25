@@ -21,13 +21,15 @@
 
   <!-- WebGL Canvas Container -->
   <div id="webgl-container"></div>
+  <div class="hud-pulse-overlay" id="hud-pulse-overlay" aria-hidden="true"></div>
 
   <!-- Video Cache for WebGL Slide Backgrounds (오프스크린 렌더링 유지) -->
   <div class="offscreen-video-cache" aria-hidden="true">
-    <video id="video-slide-1" src="img/satellite04.mp4" autoplay loop muted playsinline crossorigin="anonymous"></video>
-    <video id="video-slide-2" src="img/Dron01.mp4" autoplay loop muted playsinline></video>
-    <video id="video-slide-3" src="img/satellite02.mp4" autoplay loop muted playsinline crossorigin="anonymous"></video>
-    <video id="video-slide-4" src="img/satellite_space.mp4" autoplay loop muted playsinline></video>
+    <video id="video-slide-1" src="img/satellite04.mp4" autoplay loop muted playsinline></video>
+    <video id="video-slide-2" src="img/satellite_space.mp4" autoplay loop muted playsinline></video>
+    <video id="video-slide-3" src="img/satellite02.mp4" autoplay loop muted playsinline></video>
+    <video id="video-slide-4" src="img/aircraft.mp4" autoplay loop muted playsinline></video>
+    <video id="video-slide-5" src="img/galuxy.mp4" autoplay loop muted playsinline></video>
   </div>
 
   <!-- TOP NAVIGATION SYSTEM (KARI Official Top Bar & Main Header) -->
@@ -339,19 +341,93 @@
 
   <!-- Central Project Info (Dynamic Text with Masquerade Slider) -->
   <div class="center-content">
+    <!-- Persona Switcher Toggle Pill -->
+    <div class="mode-toggle-wrapper">
+      <div class="persona-switcher">
+        <button type="button" class="switcher-btn active" id="btn-mode-youth" onclick="setAppMode('youth')">
+          <span class="dot"></span> 청소년 호기심 모드
+        </button>
+        <button type="button" class="switcher-btn" id="btn-mode-pro" onclick="setAppMode('pro')">
+          <span class="dot"></span> 산업·연구 데이터 모드
+        </button>
+      </div>
+    </div>
+
     <div class="index-indicator">
       <span id="curr-num">01</span> <span class="indicator-divider">/</span> <span class="total-num">05</span>
     </div>
     <div class="text-mask">
-      <h1 id="project-title">NURI</h1>
+      <h1 id="project-title">LIFTOFF KOREA</h1>
     </div>
     <div class="text-mask">
-      <p id="project-subtitle">KSLV-II SPACE LAUNCH VEHICLE</p>
+      <p id="project-subtitle">KSLV-II NURI PROPULSION LAB</p>
     </div>
     <div class="text-mask">
-      <span id="project-desc" class="sub-desc">독자 개발 75톤급 액체엔진 클러스터링 기반 우주 수송 플랫폼</span>
+      <span id="project-desc" class="sub-desc">우주 수송의 시작과 75톤급 액체엔진 클러스터링 시뮬레이션</span>
+    </div>
+
+    <!-- Green Neon Action Button -->
+    <div class="text-mask action-mask">
+      <button id="btn-hero-action" class="btn-neon-action" data-modal="modal-rocket">
+        <span id="action-text">🚀 누리호 3D 가상 발사 시뮬레이션 시작</span>
+        <span class="action-arrow">↗</span>
+      </button>
     </div>
   </div>
+
+  <!-- BOTTOM FLOATING QUICK MENU BAR (Matching User Screenshot) -->
+  <nav class="bottom-quick-nav" aria-label="KARI 하단 퀵 메뉴">
+    <div class="quick-nav-inner">
+      <a href="https://www.kari.re.kr/kor/contents/208" target="_blank" class="quick-nav-item">
+        <div class="icon-circle icon-blue">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line><line x1="6" y1="12" x2="6" y2="10"></line><line x1="10" y1="12" x2="10" y2="7"></line><line x1="14" y1="12" x2="14" y2="9"></line></svg>
+        </div>
+        <span class="nav-label">연구개발</span>
+      </a>
+
+      <a href="https://www.kari.re.kr/kor/35/news" target="_blank" class="quick-nav-item">
+        <div class="icon-circle icon-blue-dark">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+        </div>
+        <span class="nav-label">뉴스룸</span>
+      </a>
+
+      <a href="https://www.kari.re.kr/kor/contents/162" target="_blank" class="quick-nav-item">
+        <div class="icon-circle icon-cyan">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <span class="nav-label">견학신청</span>
+      </a>
+
+      <a href="https://www.kari.re.kr/kor/contents/153" target="_blank" class="quick-nav-item">
+        <div class="icon-circle icon-cyan">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+        </div>
+        <span class="nav-label">국가종합비행성능시험장 공동활용신청</span>
+      </a>
+
+      <a href="https://www.kari.re.kr/kor/contents/170" target="_blank" class="quick-nav-item">
+        <div class="icon-circle icon-blue">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <span class="nav-label">인재채용</span>
+      </a>
+
+      <a href="https://www.kari.re.kr/kor/contents/95" target="_blank" class="quick-nav-item">
+        <div class="icon-circle icon-blue">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </div>
+        <span class="nav-label">나로우주센터 사용신청</span>
+      </a>
+
+      <a href="https://www.narospacecenter.kr/" target="_blank" class="quick-nav-item">
+        <div class="icon-circle icon-cyan">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        </div>
+        <span class="nav-label">나로우주센터 우주과학관</span>
+      </a>
+    </div>
+  </nav>
 
   <!-- Bottom HUD Status & Navigation Guide -->
   <footer class="hud-bottom">
@@ -361,8 +437,17 @@
       </div>
       <span class="guide-text">CLICK TO WARP</span>
     </div>
-    <div class="mission-status" id="mission-status">STATUS: STANDBY ON PAD / READY</div>
+    <div class="mission-status" id="mission-status">STATUS: 75T ENGINE CLUSTERING READY</div>
   </footer>
+
+  <!-- DUAL TARGET ACTION MODAL OVERLAY -->
+  <div class="action-modal-overlay" id="action-modal-overlay" aria-hidden="true">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modal-close-btn" aria-label="Close Modal">&times;</button>
+      <div class="modal-content-area" id="modal-content-area"></div>
+    </div>
+  </div>
 
   <!-- FULLSCREEN SITEMAP OVERLAY (Tao Tajima Interactive Menu) -->
   <div class="sitemap-overlay" id="sitemap-overlay">
