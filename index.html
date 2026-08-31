@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KARI // 한국항공우주연구원</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2.0" />
   <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link
@@ -67,7 +67,7 @@
             <span onclick="switchTheme('kids')" class="clickable">키즈모드 전환 🎈</span>
           </div>
           <button class="a11y-tool-btn" onclick="toggleA11yMenu()" aria-label="접근성 도구 및 텍스트 대체 설명 보기">접근성 ♿</button>
-          <div class="hamburger">☰</div>
+          <div class="hamburger" onclick="toggleSitemapModal()">☰</div>
         </div>
       </div>
 
@@ -192,6 +192,18 @@
         </div>
       </div>
 
+      <!-- Scroll Ticker Interactive Hotspot Badge -->
+      <div class="scrub-hotspot-container" id="scrubHotspot">
+        <div class="hotspot-header">
+          <span class="pulse-beacon"></span>
+          <span class="hotspot-tag" id="hotspotTag">STAGE 01 // IGNITION</span>
+        </div>
+        <h4 class="hotspot-title" id="hotspotTitle">75톤급 클러스터링 점화</h4>
+        <p class="hotspot-desc" id="hotspotDesc">총 300톤급 추력으로 발사대를 이륙하는 핵심 시퀀스입니다.</p>
+        <button type="button" class="hotspot-detail-btn" id="hotspotModalOpenBtn">기술 상세 분석 보기 ↗</button>
+      </div>
+
+
       <div class="scroll-down-indicator">
         <span>SCROLL DOWN TO IGNITE ↓</span>
       </div>
@@ -269,15 +281,15 @@
     <main class="pro-main-container">
 
       <!-- Research Fields (Asymmetric Bento Grid) -->
-      <section class="pro-section">
-        <div class="section-header">
+      <section class="pro-section" id="researchSection">
+        <div class="section-header bento-section-header">
           <h2 class="sec-title">// RESEARCH FIELDS</h2>
           <span class="sec-code">// KEY_CORE_FIELDS</span>
         </div>
 
         <div class="bento-grid">
           <!-- Hero Bento Card (2x2) -->
-          <div class="bento-card bento-hero">
+          <div class="bento-card bento-hero bento-main-card">
             <div class="bento-badge-group">
               <span class="badge-cyan">75T THRUST</span>
               <span class="badge-radar"><span class="radar-dot">●</span> LIVE TELEMETRY</span>
@@ -501,59 +513,56 @@
         </div>
       </section>
 
-      <!-- Ministry Banner Bar -->
-      <div class="ministry-banner-bar">
-        <div class="banner-title-area">
+      <!-- Ministry Banner Bar (Infinite Marquee Ticker) -->
+      <div class="banner-collection-bar">
+        <div class="banner-controls">
           <span class="banner-title">배너모음</span>
-          <div class="banner-controls">
-            <button class="banner-ctrl-btn btn-prev" aria-label="이전 배너">〈</button>
-            <button class="banner-ctrl-btn btn-next" aria-label="다음 배너">〉</button>
-            <button class="banner-ctrl-btn btn-play-pause" aria-label="정지">⏸</button>
-          </div>
+          <button type="button" class="btn-ctrl" id="bannerPrevBtn" aria-label="이전 배너">‹</button>
+          <button type="button" class="btn-ctrl" id="bannerNextBtn" aria-label="다음 배너">›</button>
+          <button type="button" class="btn-ctrl" id="bannerPlayPauseBtn" aria-label="자동재생 정지">❚❚</button>
         </div>
-        <div class="banner-slider-container">
-          <div class="banner-track">
-            <!-- 국토교통부 -->
-            <div class="banner-item">
-              <a href="https://www.molit.go.kr" target="_blank" title="국토교통부 홈페이지 새창열기">
-                <img src="img/국토교통부_로고.jpg" alt="국토교통부 로고" class="gov-logo-img">
-                <span class="gov-logo-text">국토교통부</span>
-              </a>
-            </div>
-            <!-- 해양수산부 -->
-            <div class="banner-item">
-              <a href="https://www.mof.go.kr" target="_blank" title="해양수산부 홈페이지 새창열기">
-                <img src="img/해양수산부_로고.jpg" alt="해양수산부 로고" class="gov-logo-img">
-                <span class="gov-logo-text">해양수산부</span>
-              </a>
-            </div>
-            <!-- 환경부 -->
-            <div class="banner-item">
-              <a href="https://www.me.go.kr" target="_blank" title="환경부 홈페이지 새창열기">
-                <img src="img/국토교통부_로고.jpg" alt="환경부 로고" class="gov-logo-img">
-                <span class="gov-logo-text">환경부</span>
-              </a>
-            </div>
-            <!-- 산업통상자원부 -->
-            <div class="banner-item">
-              <a href="https://www.motie.go.kr" target="_blank" title="산업통상자원부 홈페이지 새창열기">
-                <img src="img/국토교통부_로고.jpg" alt="산업통상자원부 로고" class="gov-logo-img">
-                <span class="gov-logo-text">산업통상자원부</span>
-              </a>
-            </div>
-            <!-- 우주항공청 -->
-            <div class="banner-item">
-              <a href="https://www.kasa.go.kr" target="_blank" title="우주항공청 홈페이지 새창열기">
-                <img src="img/우주항공청_로고.jpg" alt="우주항공청 KASA" class="kasa-logo-img">
-              </a>
-            </div>
-            <!-- 과학기술정보통신부 -->
-            <div class="banner-item">
-              <a href="https://www.msit.go.kr" target="_blank" title="과학기술정보통신부 홈페이지 새창열기">
-                <img src="img/과학기술정보통신부_로고.jpg" alt="과학기술정보통신부 로고" class="gov-logo-img">
-                <span class="gov-logo-text">과학기술정보통신부</span>
-              </a>
-            </div>
+        <div class="banner-divider"></div>
+        <div class="banner-viewport">
+          <div class="banner-track" id="bannerTrack">
+            <!-- 배너 아이템 1세트 -->
+            <a href="https://www.msit.go.kr" target="_blank" class="banner-item" title="과학기술정보통신부 홈페이지 새창열기">
+              <img src="img/과학기술정보통신부_로고.jpg" alt="과학기술정보통신부 로고" class="b-logo-img"> 과학기술정보통신부
+            </a>
+            <a href="https://www.molit.go.kr" target="_blank" class="banner-item" title="국토교통부 홈페이지 새창열기">
+              <img src="img/국토교통부_로고.jpg" alt="국토교통부 로고" class="b-logo-img"> 국토교통부
+            </a>
+            <a href="https://www.mof.go.kr" target="_blank" class="banner-item" title="해양수산부 홈페이지 새창열기">
+              <img src="img/해양수산부_로고.jpg" alt="해양수산부 로고" class="b-logo-img"> 해양수산부
+            </a>
+            <a href="https://www.me.go.kr" target="_blank" class="banner-item" title="환경부 홈페이지 새창열기">
+              <img src="img/국토교통부_로고.jpg" alt="환경부 로고" class="b-logo-img"> 환경부
+            </a>
+            <a href="https://www.motie.go.kr" target="_blank" class="banner-item" title="산업통상자원부 홈페이지 새창열기">
+              <img src="img/국토교통부_로고.jpg" alt="산업통상자원부 로고" class="b-logo-img"> 산업통상자원부
+            </a>
+            <a href="https://www.kasa.go.kr" target="_blank" class="banner-item" title="우주항공청 홈페이지 새창열기">
+              <img src="img/우주항공청_로고.jpg" alt="우주항공청 로고" class="b-logo-img"> 우주항공청 (KASA)
+            </a>
+            
+            <!-- 무한 루프용 복제 세트 -->
+            <a href="https://www.msit.go.kr" target="_blank" class="banner-item" title="과학기술정보통신부 홈페이지 새창열기">
+              <img src="img/과학기술정보통신부_로고.jpg" alt="과학기술정보통신부 로고" class="b-logo-img"> 과학기술정보통신부
+            </a>
+            <a href="https://www.molit.go.kr" target="_blank" class="banner-item" title="국토교통부 홈페이지 새창열기">
+              <img src="img/국토교통부_로고.jpg" alt="국토교통부 로고" class="b-logo-img"> 국토교통부
+            </a>
+            <a href="https://www.mof.go.kr" target="_blank" class="banner-item" title="해양수산부 홈페이지 새창열기">
+              <img src="img/해양수산부_로고.jpg" alt="해양수산부 로고" class="b-logo-img"> 해양수산부
+            </a>
+            <a href="https://www.me.go.kr" target="_blank" class="banner-item" title="환경부 홈페이지 새창열기">
+              <img src="img/국토교통부_로고.jpg" alt="환경부 로고" class="b-logo-img"> 환경부
+            </a>
+            <a href="https://www.motie.go.kr" target="_blank" class="banner-item" title="산업통상자원부 홈페이지 새창열기">
+              <img src="img/국토교통부_로고.jpg" alt="산업통상자원부 로고" class="b-logo-img"> 산업통상자원부
+            </a>
+            <a href="https://www.kasa.go.kr" target="_blank" class="banner-item" title="우주항공청 홈페이지 새창열기">
+              <img src="img/우주항공청_로고.jpg" alt="우주항공청 로고" class="b-logo-img"> 우주항공청 (KASA)
+            </a>
           </div>
         </div>
       </div>
@@ -1052,6 +1061,171 @@
     </div>
   </div>
 
+  <!-- ================= [KARI ACCESSIBILITY SETTINGS MODAL] ================= -->
+  <div id="a11ySettingsModal" class="a11y-modal-overlay">
+    <div class="a11y-modal-container">
+      <div class="a11y-modal-header">
+        <h3>♿ KARI 정보 접근성(A11y) 설정</h3>
+        <button class="a11y-modal-close-btn" onclick="toggleA11yMenu()">✕</button>
+      </div>
+      <div class="a11y-modal-body">
+        <div class="a11y-setting-row">
+          <span class="a11y-setting-label">글자 크기 조절 (Text Size)</span>
+          <div class="a11y-btn-group">
+            <button class="a11y-opt-btn active" id="a11yTextNormal" onclick="setA11yFontSize('normal')">보통 (100%)</button>
+            <button class="a11y-opt-btn" id="a11yTextLarge" onclick="setA11yFontSize('large')">크게 (125%)</button>
+          </div>
+        </div>
+        
+        <div class="a11y-setting-row">
+          <span class="a11y-setting-label">고대비 모드 (High Contrast)</span>
+          <button class="a11y-toggle-btn" id="a11yContrastBtn" onclick="toggleA11yHighContrast()">고대비 OFF</button>
+        </div>
+
+        <div class="a11y-setting-row">
+          <span class="a11y-setting-label">스크린 리더 해설 (Screen Reader)</span>
+          <button class="a11y-toggle-btn" id="a11yVoiceBtn" onclick="toggleA11yVoiceHelp()">해설 끄기 🔇</button>
+        </div>
+      </div>
+      <div class="a11y-modal-footer">
+        <p>※ 본 서비스는 한국형 웹 콘텐츠 접근성 지침(KWCAG 2.2)을 준수합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= [KARI FULL SITEMAP OVERLAY MODAL] ================= -->
+  <div id="sitemapModal" class="sitemap-modal-overlay">
+    <div class="sitemap-modal-container">
+      <div class="sitemap-header">
+        <div class="sitemap-logo">
+          <img src="img/logo_symbol.png" alt="KARI" class="sitemap-logo-img" />
+          <span class="sitemap-logo-text">한국항공우주연구원</span>
+        </div>
+        <button class="sitemap-close-btn" onclick="toggleSitemapModal()">✕</button>
+      </div>
+      
+      <div class="sitemap-body-grid">
+        <!-- Row 1: KARI 소개 -->
+        <div class="sitemap-row">
+          <div class="sitemap-row-title">KARI 소개</div>
+          <div class="sitemap-sub-grid">
+            <div class="sitemap-sub-col">
+              <a href="#about-vision" class="sitemap-sub-head" onclick="toggleSitemapModal()">인사말</a>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#about-history" class="sitemap-sub-head" onclick="toggleSitemapModal()">일반현황</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#about-vision" onclick="toggleSitemapModal()">설립목적 및 기능</a></li>
+                <li><a href="#about-history" onclick="toggleSitemapModal()">연혁 및 연구성과</a></li>
+                <li><a href="#about-ci" onclick="toggleSitemapModal()">CI</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#about-facility" class="sitemap-sub-head" onclick="toggleSitemapModal()">조직안내</a>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#news-story" class="sitemap-sub-head" onclick="toggleSitemapModal()">지속가능경영</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#news-notice" onclick="toggleSitemapModal()">추진조직</a></li>
+                <li><a href="#news-press" onclick="toggleSitemapModal()">추진체계</a></li>
+                <li><a href="#news-recruit" onclick="toggleSitemapModal()">지속가능경영보고서</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#news-notice" class="sitemap-sub-head" onclick="toggleSitemapModal()">윤리경영</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#news-notice" onclick="toggleSitemapModal()">윤리헌장</a></li>
+                <li><a href="#news-press" onclick="toggleSitemapModal()">수의계약 현황</a></li>
+                <li><a href="#news-recruit" onclick="toggleSitemapModal()">부패방지 현황</a></li>
+                <li><a href="#news-recruit" onclick="toggleSitemapModal()">윤리위반 신고센터</a></li>
+                <li><a href="#news-recruit" onclick="toggleSitemapModal()">반부패·청렴</a></li>
+                <li><a href="#news-recruit" onclick="toggleSitemapModal()">청렴정보공개</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#tech" class="sitemap-sub-head" onclick="toggleSitemapModal()">안전보건경영방침</a>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#about-location" class="sitemap-sub-head" onclick="toggleSitemapModal()">오시는길</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: 연구개발 -->
+        <div class="sitemap-row">
+          <div class="sitemap-row-title">연구개발</div>
+          <div class="sitemap-sub-grid">
+            <div class="sitemap-sub-col">
+              <a href="#rd-aero" class="sitemap-sub-head" onclick="toggleSitemapModal()">항공</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#rd-aero" onclick="toggleSitemapModal()">AAM</a></li>
+                <li><a href="#rd-aero" onclick="toggleSitemapModal()">미래 비행체 체제</a></li>
+                <li><a href="#rd-aero" onclick="toggleSitemapModal()">미래 비행체 첨단항공 추진</a></li>
+                <li><a href="#rd-aero" onclick="toggleSitemapModal()">무인기 활용 & 자율비행</a></li>
+                <li><a href="#rd-aero" onclick="toggleSitemapModal()">첨단 항공기술</a></li>
+                <li><a href="#rd-aero" onclick="toggleSitemapModal()">국가종합비행성능시험장</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#bento-satellite" class="sitemap-sub-head highlight-menu" onclick="toggleSitemapModal()">인공위성</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#bento-satellite" onclick="toggleSitemapModal()">인공위성 개요</a></li>
+                <li><a href="#bento-satellite" onclick="toggleSitemapModal()">다목적실용위성(아리랑위성)</a></li>
+                <li><a href="#bento-satellite" onclick="toggleSitemapModal()">정지궤도위성</a></li>
+                <li><a href="#bento-satellite" onclick="toggleSitemapModal()">차세대중형위성</a></li>
+                <li><a href="#bento-satellite" onclick="toggleSitemapModal()">인공위성 탑재체</a></li>
+                <li><a href="#bento-satellite" onclick="toggleSitemapModal()">위성우주탐사시험센터</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#rd-rocket" class="sitemap-sub-head" onclick="toggleSitemapModal()">우주발사체</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#rd-rocket" onclick="toggleSitemapModal()">우주발사체 개요</a></li>
+                <li><a href="#rd-rocket" onclick="toggleSitemapModal()">차세대발사체</a></li>
+                <li><a href="#rd-rocket" onclick="toggleSitemapModal()">누리호</a></li>
+                <li><a href="#rd-rocket" onclick="toggleSitemapModal()">나로호</a></li>
+                <li><a href="#rd-rocket" onclick="toggleSitemapModal()">나로우주센터</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#tech" class="sitemap-sub-head" onclick="toggleSitemapModal()">국가위성정보활용지원</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#tech" onclick="toggleSitemapModal()">위성 운영기술 연구</a></li>
+                <li><a href="#tech" onclick="toggleSitemapModal()">위성 활용기술 연구</a></li>
+                <li><a href="#tech" onclick="toggleSitemapModal()">위성영상을 활용한 국내외협력</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#rd-space" class="sitemap-sub-head" onclick="toggleSitemapModal()">우주탐사</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#rd-space" onclick="toggleSitemapModal()">달 착륙선</a></li>
+                <li><a href="#rd-space" onclick="toggleSitemapModal()">다누리</a></li>
+                <li><a href="#rd-space" onclick="toggleSitemapModal()">우주탐사연구센터</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#rd-kps" class="sitemap-sub-head" onclick="toggleSitemapModal()">위성항법</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#rd-kps" onclick="toggleSitemapModal()">한국형 위성항법시스템(KPS)</a></li>
+                <li><a href="#rd-kps" onclick="toggleSitemapModal()">한국형 정밀 GPS 위치보정시스템(KASS)</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#tech" class="sitemap-sub-head" onclick="toggleSitemapModal()">독립사업단</a>
+              <ul class="sitemap-sub-items">
+                <li><a href="#tech" onclick="toggleSitemapModal()">스페이스파이오니어</a></li>
+                <li><a href="#tech" onclick="toggleSitemapModal()">무인이동체사업단</a></li>
+              </ul>
+            </div>
+            <div class="sitemap-sub-col">
+              <a href="#tech" class="sitemap-sub-head" onclick="toggleSitemapModal()">연구개발투자성과</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= [NURIHO LAUNCH SIMULATION MODAL] ================= -->
   <div id="nurihoSimModal" class="nuriho-modal-overlay">
     <div class="nuriho-modal-container">
@@ -1121,7 +1295,21 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- ================= [MISSION STAGE DETAIL MODAL] ================= -->
+  <div class="stage-detail-modal" id="stageDetailModal">
+    <div class="modal-backdrop" id="closeStageModalBackdrop"></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h3 id="stageModalHeaderTitle">발사 시퀀스 기술 제원</h3>
+        <button type="button" class="modal-close-btn" id="closeStageModalBtn">✕</button>
+      </div>
+      <div class="modal-content">
+        <p id="stageModalBodyText" class="modal-desc-body"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js?v=2.0"></script>
 </body>
 <!-- Intro Number Ticker Preloader Screen -->
 <div id="introPreloader" class="intro-preloader">

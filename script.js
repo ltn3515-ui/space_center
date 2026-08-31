@@ -1,3 +1,75 @@
+// 브라우저 새로고침 시 스크롤 위치 강제 기억 복원(Scroll Restoration) 비활성화 및 초기화
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
+// GSAP ScrollTrigger가 있을 경우 스크롤 메모리를 비우고 최상단에서 리프레시되도록 통제
+if (typeof ScrollTrigger !== 'undefined') {
+  ScrollTrigger.clearScrollMemory();
+}
+
+// 윈도우 렌더링 로드가 완전히 마무리된 시점에도 스크롤을 0으로 픽스하여 시각적 복원을 완전 차단
+window.addEventListener('load', () => {
+  window.scrollTo(0, 0);
+  if (typeof ScrollTrigger !== 'undefined') {
+    ScrollTrigger.refresh();
+  }
+});
+
+// 단계별 데이터 배열 정의
+const stagesData = [
+  {
+    stageNum: 1,
+    tag: "STAGE 01 // IGNITION",
+    title: "75톤급 클러스터링 점화",
+    desc: "총 300톤급 추력으로 발사대를 이륙하는 핵심 시퀀스입니다.",
+    modalTitle: "STAGE 01 // 엔진 점화 상세 제원",
+    longDesc: `🚀 누리호 1단 엔진 점화 및 이륙 시퀀스
+
+누리호 1단부에는 독자 설계된 75톤급 액체 엔진 4기가 기하학적으로 배치 및 클러스터링 결합되어 총 300톤의 추력을 발휘합니다.
+
+- 추진제: 케로신(Jet A-1) + 액체산소(LOX)
+- 연소 시간: 127.3초
+- 연소실 압력: 60 bar
+- 지상 연소 비추력: 292.5초
+
+발사 수십 초 전 최종 카운트다운 완료 시점에 가스발생기 사이클 시동과 함께 터보펌프가 작동을 시작하며 엔진 점화와 이륙이 단번에 개시됩니다.`
+  },
+  {
+    stageNum: 2,
+    tag: "STAGE 02 // SEPARATION",
+    title: "1단 분리 및 페어링 사출",
+    desc: "고도 59km에서 1단을 분리하고 위성 덮개를 사출합니다.",
+    modalTitle: "STAGE 02 // 1단 분리 및 페어링 사출 제원",
+    longDesc: `🛰️ 1단 단 분리 및 보호 페어링 전개 시퀀스
+
+대기권의 최대 공력 동압(Max-Q)을 지나 비행 고도가 59km에 다다르는 MECO 시점에 1단 결합부의 파이로볼트 결속 장치가 폭발 격리 분리됩니다.
+
+- 단 분리 고도: 59.0 KM
+- 2단 엔진 추력: 75 t (진공 환경 특화 노즐 적용)
+- 위성 보호 페어링 사출 고도: 191 KM
+
+지상 대기 밀도가 희박해지는 고도 191km에서 내부의 위성 탑재체를 보호하고 있던 덮개인 페어링 양 날개가 기하학적 궤도를 따라 우주 밖으로 안전하게 전개 및 분리 사출됩니다.`
+  },
+  {
+    stageNum: 3,
+    tag: "STAGE 03 // ORBITAL INSERTION",
+    title: "3단 점화 및 위성 궤도 투입",
+    desc: "최종 목표 고도 700km 저궤도에 위성을 성공적으로 사출합니다.",
+    modalTitle: "STAGE 03 // 위성 사출 및 궤도 투입 제원",
+    longDesc: `🔬 3단 비행 및 차세대 실용위성 사출 완수
+
+최종 단계인 3단 7톤급 액체엔진이 진공 우주 궤도에서 약 500초간 정교하게 화력 연소 작동하여 비행 속도를 제1우주속도인 초속 7.5km까지 도달시킵니다.
+
+- 3단 엔진 추력: 7.0 t
+- 최종 도달 목표 고도: 700.0 KM
+- 위성 투입 속도: 7.5 KM/S
+
+목표 지점에 도달하면 최종적으로 스프링 가속 격리 메커니즘이 구동되어 오차 범위 0.1% 미만의 극치 정확도로 차세대 소형위성을 타겟 궤도 평면에 안착 및 사출시킵니다.`
+  }
+];
+
 // ==========================================
 // Magic UI Style Number Ticker Intro Animation
 // ==========================================
@@ -7,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressFill = document.getElementById('introProgressFill');
   const statusText = document.getElementById('introStatusText');
 
-  // 상태 메시지 배열
   const statusLogs = [
     "ESTABLISHING GROUND STATION LINK...",
     "CALIBRATING ORBITAL TELEMETRY...",
@@ -16,43 +87,35 @@ document.addEventListener('DOMContentLoaded', () => {
     "READY FOR MISSION CONTROL"
   ];
 
-  // GSAP을 이용한 0 -> 100 부드러운 카운팅
   const tickerObj = { val: 0 };
 
-  gsap.to(tickerObj, {
-    val: 100,
-    duration: 2.2, // 카운팅 시간 (2.2초)
-    ease: "power2.out",
-    onUpdate: () => {
-      const currentVal = Math.floor(tickerObj.val);
-      numberTicker.innerText = currentVal;
-      progressFill.style.width = currentVal + "%";
+  if (typeof gsap !== 'undefined') {
+    gsap.to(tickerObj, {
+      val: 100,
+      duration: 2.2,
+      ease: "power2.out",
+      onUpdate: () => {
+        const currentVal = Math.floor(tickerObj.val);
+        if (numberTicker) numberTicker.innerText = currentVal;
+        if (progressFill) progressFill.style.width = currentVal + "%";
 
-      // 진행률에 따라 상태 메시지 변경
-      if (currentVal < 25) {
-        statusText.innerText = statusLogs[0];
-      } else if (currentVal < 50) {
-        statusText.innerText = statusLogs[1];
-      } else if (currentVal < 75) {
-        statusText.innerText = statusLogs[2];
-      } else if (currentVal < 100) {
-        statusText.innerText = statusLogs[3];
-      } else {
-        statusText.innerText = statusLogs[4];
-      }
-    },
-    onComplete: () => {
-      // 100% 완료 후 0.3초 대기 후 페이드아웃
-      setTimeout(() => {
-        gsap.to(preloader, {
-          opacity: 0,
-          scale: 1.05,
-          duration: 0.8,
-          ease: "power3.inOut",
-          onComplete: () => {
-            preloader.classList.add('loaded');
-            // 메인 화면 히어로 텍스트 및 비디오 등장 애니메이션 트리거
-            if (typeof gsap !== 'undefined') {
+        if (statusText) {
+          if (currentVal < 25) statusText.innerText = statusLogs[0];
+          else if (currentVal < 50) statusText.innerText = statusLogs[1];
+          else if (currentVal < 75) statusText.innerText = statusLogs[2];
+          else if (currentVal < 100) statusText.innerText = statusLogs[3];
+          else statusText.innerText = statusLogs[4];
+        }
+      },
+      onComplete: () => {
+        setTimeout(() => {
+          gsap.to(preloader, {
+            opacity: 0,
+            scale: 1.05,
+            duration: 0.8,
+            ease: "power3.inOut",
+            onComplete: () => {
+              if (preloader) preloader.classList.add('loaded');
               gsap.from(".hero-content > *", {
                 y: 30,
                 opacity: 0,
@@ -61,16 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ease: "power3.out"
               });
             }
-          }
-        });
-      }, 300);
-    }
-  });
+          });
+        }, 300);
+      }
+    });
+  }
 });
-/**
- * 테마 스왑 함수 (일반 관제 모드 ↔ 키즈 모드)
- * 웜홀 워프 스타버스트 캔버스 애니메이션 및 카운트다운 적용
- */
+
 let starburstEngine = null;
 
 function switchTheme(targetTheme) {
@@ -85,89 +145,76 @@ function switchTheme(targetTheme) {
   const countdown = document.getElementById('transCountdown');
 
   if (overlay && canvas && flash) {
-    // 1. 오버레이 활성화 및 텍스트 셋팅
     overlay.classList.add('active');
     flash.classList.remove('flash');
 
-    if (targetTheme === 'kids') {
-      subTitle.innerText = "SYSTEM WARP INITIATED";
-      mainTitle.innerText = "🚀 신나는 KARI 키즈 행성으로 도약 중!";
-    } else {
-      subTitle.innerText = "TELEMETRY RETRIEVAL IN PROGRESS";
-      mainTitle.innerText = "🛰️ KARI 미션 관제실 시스템 복귀 중...";
+    if (starburstEngine) {
+      starburstEngine.stop();
+      starburstEngine = null;
     }
 
-    // 2. 스타버스트 워프 캔버스 구동
-    if (starburstEngine) starburstEngine.stop();
-    starburstEngine = runWarpStarburst(canvas);
+    if (targetTheme === 'kids') {
+      // CASE A: 일반 ➔ 키즈 (To Kids)
+      overlay.classList.remove('to-standard');
+      if (subTitle) subTitle.innerText = "SYSTEM WARP INITIATED";
+      if (mainTitle) mainTitle.innerText = "🚀 신나는 KARI 키즈 행성으로 도약 중!";
 
-    // 3. HUD 카운트다운 연출 (3 -> 2 -> 1 -> WARP SPEED!)
-    countdown.innerText = "WARP IN 3";
-    
-    setTimeout(() => {
-      countdown.innerText = "WARP IN 2";
-    }, 400);
+      starburstEngine = runWarpStarburst(canvas);
 
-    setTimeout(() => {
-      countdown.innerText = "WARP IN 1";
-    }, 800);
+      if (countdown) countdown.innerText = "WARP IN 3";
+      setTimeout(() => { if (countdown) countdown.innerText = "WARP IN 2"; }, 400);
+      setTimeout(() => { if (countdown) countdown.innerText = "WARP IN 1"; }, 800);
 
-    // 4. [1.2초 시점] 스타버스트 최고조 도달 후 화이트 플래시 및 실제 모드 교체
-    setTimeout(() => {
-      countdown.innerText = "WARP SPEED!";
-      flash.classList.add('flash'); // 화이트 플래시 애니메이션 구동
+      setTimeout(() => {
+        if (countdown) countdown.innerText = "WARP SPEED!";
+        flash.classList.add('flash');
 
-      // 실제 뷰 및 바디 클래스 스왑
-      if (targetTheme === 'kids') {
         if (proView) proView.classList.remove('active');
         body.classList.remove('theme-default');
-        body.classList.add('theme-kids');
-        body.classList.add('kids-mode'); // 키즈 테마 클래스 결합
+        body.classList.add('theme-kids', 'kids-mode');
         if (kidsView) kidsView.classList.add('active');
-      } else {
+
+        updateChatbotTheme(targetTheme);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 1200);
+
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        if (starburstEngine) {
+          starburstEngine.stop();
+          starburstEngine = null;
+        }
+      }, 1500);
+
+    } else {
+      // CASE B: 키즈 ➔ 일반 (To Standard - 관제실 복귀)
+      overlay.classList.add('to-standard');
+      if (subTitle) subTitle.innerText = "FLIGHT TELEMETRY SYSTEM // RE-CONNECT";
+      if (mainTitle) mainTitle.innerText = "KARI 메인 항공우주 관제실 복귀 중";
+      if (countdown) countdown.innerText = "MISSION PROTOCOL ACTIVE";
+
+      // 0.7초 시점에 빠른 모드 갱신
+      setTimeout(() => {
+        flash.classList.add('flash');
+
         if (kidsView) kidsView.classList.remove('active');
-        body.classList.remove('theme-kids');
-        body.classList.remove('kids-mode');
+        body.classList.remove('theme-kids', 'kids-mode');
         body.classList.add('theme-default');
         if (proView) proView.classList.add('active');
-      }
 
-      updateChatbotTheme(targetTheme); // 챗봇 아바타/UI 교체
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }, 1200);
+        updateChatbotTheme(targetTheme);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 700);
 
-    // 5. [1.5초 시점] 오버레이 페이드아웃 및 웜홀 리소스 정리
-    setTimeout(() => {
-      overlay.classList.remove('active');
-      if (starburstEngine) {
-        starburstEngine.stop();
-        starburstEngine = null;
-      }
-    }, 1500);
-
-  } else {
-    // 폴백 코드 (오버레이가 존재하지 않는 경우 즉시 스왑)
-    if (targetTheme === 'kids') {
-      if (proView) proView.classList.remove('active');
-      body.classList.remove('theme-default');
-      body.classList.add('theme-kids');
-      body.classList.add('kids-mode');
-      if (kidsView) kidsView.classList.add('active');
-    } else {
-      if (kidsView) kidsView.classList.remove('active');
-      body.classList.remove('theme-kids');
-      body.classList.remove('kids-mode');
-      body.classList.add('theme-default');
-      if (proView) proView.classList.add('active');
+      // 0.95초 시점에 오버레이 퇴출 리셋
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        overlay.classList.remove('to-standard');
+      }, 950);
     }
-    updateChatbotTheme(targetTheme);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
 
-/**
- * 웜홀 스타버스트 초공간 이동 캔버스 파티클 엔진
- */
 function runWarpStarburst(canvasEl) {
   const ctx = canvasEl.getContext('2d');
   let w = canvasEl.width = window.innerWidth;
@@ -176,13 +223,12 @@ function runWarpStarburst(canvasEl) {
   const stars = [];
   const numStars = 300;
 
-  // 별빛 파티클 무작위 3D 공간 배치
   for (let i = 0; i < numStars; i++) {
     stars.push({
       x: (Math.random() - 0.5) * 1000,
       y: (Math.random() - 0.5) * 1000,
       z: Math.random() * 1000,
-      color: `hsl(${Math.random() * 60 + 180}, 100%, 75%)` // 사이언/아쿠아 계열
+      color: `hsl(${Math.random() * 60 + 180}, 100%, 75%)`
     });
   }
 
@@ -194,7 +240,7 @@ function runWarpStarburst(canvasEl) {
     if (!active) return;
     animId = requestAnimationFrame(draw);
 
-    ctx.fillStyle = 'rgba(3, 5, 12, 0.15)'; // 잔상이 길게 남도록 꼬리 연출
+    ctx.fillStyle = 'rgba(3, 5, 12, 0.15)';
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2;
@@ -204,22 +250,18 @@ function runWarpStarburst(canvasEl) {
       const star = stars[i];
       star.z -= warpSpeed;
 
-      // 앞질러 화면 밖으로 벗어난 별빛 리셋
       if (star.z <= 0) {
         star.z = 1000;
         star.x = (Math.random() - 0.5) * 1000;
         star.y = (Math.random() - 0.5) * 1000;
       }
 
-      // 원점을 기준으로 뻗어나가는 3D 투영식 변환
       const k = 128.0 / star.z;
       const px = star.x * k + cx;
       const py = star.y * k + cy;
 
       if (px >= 0 && px < w && py >= 0 && py < h) {
         const size = (1.5 - star.z / 1000) * 2;
-        
-        // 이전 좌표와 연결하여 광선 꼬리(선) 그리기
         const oldK = 128.0 / (star.z + warpSpeed);
         const ox = star.x * oldK + cx;
         const oy = star.y * oldK + cy;
@@ -232,8 +274,6 @@ function runWarpStarburst(canvasEl) {
         ctx.stroke();
       }
     }
-
-    // 워프 가속도 증폭
     warpSpeed += 0.45;
   }
 
@@ -247,9 +287,6 @@ function runWarpStarburst(canvasEl) {
   };
 }
 
-/**
- * 챗봇 테마 동적 전환 (일반 ↔ 키즈)
- */
 function updateChatbotTheme(theme) {
   const avatarImg = document.getElementById('botAvatarImg');
   const dialogueText = document.getElementById('botDialogueText');
@@ -257,32 +294,20 @@ function updateChatbotTheme(theme) {
   const chipsContainer = document.getElementById('chatChipsContainer');
 
   if (theme === 'kids') {
-    // 1. 아바타 이미지 kids 버전으로 교체
-    if (avatarImg) {
-      avatarImg.src = avatarImg.getAttribute('data-kids') || 'img/robot02.jpg';
-    }
-    // 2. 안내 및 버튼 문구 kids화
+    if (avatarImg) avatarImg.src = avatarImg.getAttribute('data-kids') || 'img/robot02.jpg';
     if (dialogueText) dialogueText.innerText = "우주 친구야, 궁금한 게 있니? 🚀";
     if (actionBtn) actionBtn.innerText = "우주 로봇이랑 놀기 💬";
-    
-    // 3. 추천 퀵 칩 kids화
     if (chipsContainer) {
       chipsContainer.innerHTML = `
         <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 로켓 조립해보기')">🚀 로켓 조립해보기</button>
         <button class="quick-question-chip" onclick="sendQuickQuestion('⭐ 우주 퀴즈 풀기')">⭐ 우주 퀴즈 풀기</button>
-        <button class="quick-question-chip" onclick="sendQuickQuestion('👨&zwj;🚀 우주인은 밥을 어떻게 먹어?')">👨&zwj;🚀 우주인은 밥을 어떻게 먹어?</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('👨‍🚀 우주인은 밥을 어떻게 먹어?')">👨‍🚀 우주인은 밥을 어떻게 먹어?</button>
       `;
     }
   } else {
-    // 1. 아바타 이미지 default 버전으로 원복
-    if (avatarImg) {
-      avatarImg.src = avatarImg.getAttribute('data-default') || 'img/robot.jpg';
-    }
-    // 2. 안내 및 버튼 문구 일반화
+    if (avatarImg) avatarImg.src = avatarImg.getAttribute('data-default') || 'img/robot.jpg';
     if (dialogueText) dialogueText.innerText = "무엇을 도와드릴까요?";
     if (actionBtn) actionBtn.innerText = "관제 AI와 대화하기 💬";
-    
-    // 3. 추천 퀵 칩 일반화 (우주항공 전문 질문 칩 3종 탑재)
     if (chipsContainer) {
       chipsContainer.innerHTML = `
         <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 누리호 75톤 엔진 구조')">🚀 누리호 75톤 엔진 구조</button>
@@ -293,9 +318,6 @@ function updateChatbotTheme(theme) {
   }
 }
 
-/**
- * 텔레메트리 수치 업데이트 및 은은한 사이언 발광 트랜지션
- */
 function updateTelemetryVal(el, newValue) {
   if (!el) return;
   if (el.textContent !== newValue) {
@@ -308,66 +330,37 @@ function updateTelemetryVal(el, newValue) {
   }
 }
 
-/**
- * 우측 챕터 인디케이터 도트 활성화 싱크
- */
 function updateMissionTimelineDots(progress) {
   const items = document.querySelectorAll('#missionSequenceNav .seq-dot-item');
   if (!items.length) return;
-  
+
   items.forEach(item => item.classList.remove('active'));
 
-  if (progress < 0.3) {
-    items[0].classList.add('active');
-  } else if (progress >= 0.3 && progress < 0.7) {
-    items[1].classList.add('active');
-  } else {
-    items[2].classList.add('active');
-  }
+  if (progress < 0.3) items[0].classList.add('active');
+  else if (progress >= 0.3 && progress < 0.7) items[1].classList.add('active');
+  else items[2].classList.add('active');
 }
 
-/**
- * 세로형 미션 챕터 인디케이터 클릭 시 해당 프레임 구간으로 스크롤 이동
- */
-window.scrollToMissionStage = function(ratio) {
+window.scrollToMissionStage = function (ratio) {
   if (typeof ScrollTrigger === 'undefined') return;
   const trigger = ScrollTrigger.getById("heroScrollTrigger");
   if (!trigger) return;
 
-  const start = trigger.start;
-  const end = trigger.end;
-  const targetScroll = start + (end - start) * ratio;
+  const targetScroll = trigger.start + (trigger.end - trigger.start) * ratio;
 
-  // ScrollToPlugin이 로드되어 있으면 사용, 없으면 vanilla JS scrollTo smooth 폴백
   if (typeof gsap !== 'undefined' && gsap.plugins && gsap.plugins.scrollTo) {
-    gsap.to(window, {
-      scrollTo: targetScroll,
-      duration: 1.2,
-      ease: "power2.inOut"
-    });
+    gsap.to(window, { scrollTo: targetScroll, duration: 1.2, ease: "power2.inOut" });
   } else {
-    window.scrollTo({
-      top: targetScroll,
-      behavior: 'smooth'
-    });
+    window.scrollTo({ top: targetScroll, behavior: 'smooth' });
   }
 };
 
 let installedPartsCount = 0;
-const installedPartsMap = {
-  booster: false,
-  tank: false,
-  payload: false,
-  fairing: false
-};
+const installedPartsMap = { booster: false, tank: false, payload: false, fairing: false };
 
-/**
- * 키즈 모드 3D 로켓 연구소 부품 선택 & 결합 인터랙션
- */
 function addRocketPart(partType, btnEl) {
   if (installedPartsMap[partType]) return;
 
-  // 조립 순서 검증 (부스터 -> 연료탱크 -> 페이로드 -> 페어링)
   const correctOrder = ['booster', 'tank', 'payload', 'fairing'];
   const expectedPart = correctOrder[installedPartsCount];
 
@@ -388,24 +381,17 @@ function addRocketPart(partType, btnEl) {
     installedPartsMap[partType] = true;
     installedPartsCount++;
 
-    // 슬롯 결합 스냅인 애니메이션
     targetSlot.classList.remove('empty');
     targetSlot.classList.add('installed');
-
-    // 스냅 별가루 파티클 생성
     createSparkles(targetSlot);
 
-    // 버튼 장착 완료 상태 전환
     if (btnEl) {
       btnEl.classList.add('installed');
       btnEl.disabled = true;
       btnEl.innerHTML = `<span class="part-icon">✓</span> 장착 완료!`;
     }
 
-    // 진행률 뱃지 업데이트
-    if (progressBadge) {
-      progressBadge.textContent = `조립 진행률: ${installedPartsCount} / 4`;
-    }
+    if (progressBadge) progressBadge.textContent = `조립 진행률: ${installedPartsCount} / 4`;
 
     const partNames = {
       fairing: '헤드 페어링 (파사포트 Y)',
@@ -419,7 +405,6 @@ function addRocketPart(partType, btnEl) {
       statusText.style.color = '#00cec9';
     }
 
-    // 4개 부품 모두 결합 완료 시! (💥 펑! 변신 파티클 폭발 후 로켓으로 합체되어 발사!)
     if (installedPartsCount === 4) {
       const slotsWrapper = document.getElementById('partsSlotsWrapper');
       const powOverlay = document.getElementById('powExplosionOverlay');
@@ -435,22 +420,15 @@ function addRocketPart(partType, btnEl) {
         statusText.style.color = '#ff7675';
       }
 
-      // 1. POW 이펙트 폭발 & 부품 합체 변신
       if (powOverlay) powOverlay.classList.add('pow-burst');
       if (slotsWrapper) slotsWrapper.classList.add('hidden-fused');
       if (superRocket) superRocket.classList.add('transformed');
 
-      // 2. 0.6초 후 수직 상공 발사 애니메이션 시작!
-      setTimeout(() => {
-        launchAssembledRocketUpward();
-      }, 600);
+      setTimeout(() => { launchAssembledRocketUpward(); }, 600);
     }
   }
 }
 
-/**
- * 로켓 조립 완성 후 수직 상승 발사 애니메이션 (Upward Launch Sequence)
- */
 function launchAssembledRocketUpward() {
   const tower = document.getElementById('assembledTower');
   const statusText = document.getElementById('stageStatusText');
@@ -462,7 +440,6 @@ function launchAssembledRocketUpward() {
 
   if (!tower || tower.classList.contains('blasting-off')) return;
 
-  // 1. 엔진 화염 및 진동 카운트다운 (0.5s Vibration Shake)
   tower.classList.add('shaking-launch');
   if (statusText) {
     statusText.innerHTML = '🔥 3.. 2.. 1.. 엔진 점화! 우주로 무사히 발사!';
@@ -470,7 +447,6 @@ function launchAssembledRocketUpward() {
   }
 
   setTimeout(() => {
-    // 2. 수직 상공 쾌속 비행 발사 (Blasting Off Upward Out of View)
     tower.classList.remove('shaking-launch');
     tower.classList.add('blasting-off');
 
@@ -479,18 +455,12 @@ function launchAssembledRocketUpward() {
       statusText.style.color = '#00cec9';
     }
 
-    // 3. 1.2초 후 축하 뱃지 모달 토스트 띄우기
-    setTimeout(() => {
-      if (toast) toast.classList.add('show');
-    }, 1200);
-
-    // 4. 3.7초 후 페이드아웃 시작 (탑에서 2.7초간 대기 후 0.5초간 투명화)
+    setTimeout(() => { if (toast) toast.classList.add('show'); }, 1200);
     setTimeout(() => {
       tower.style.transition = 'opacity 0.5s ease';
       tower.style.opacity = '0';
     }, 3700);
 
-    // 5. 4.2초 후 자동 스테이지 리셋 (Replay Ready)
     setTimeout(() => {
       if (toast) toast.classList.remove('show');
 
@@ -545,1050 +515,26 @@ function launchAssembledRocketUpward() {
         tower.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
         tower.style.opacity = '1';
       }, 60);
-
     }, 4200);
-
   }, 500);
 }
 
-/**
- * [조립 완료! 🚀] 버튼 클릭 수직 발사 트리거
- */
 function finishRocketAssembly() {
   if (installedPartsCount < 4) {
-    alert(`아직 로켓 부품이 남았어요! (${installedPartsCount}/4)\n4개 부품(부스터, 연료탱크, 페이로드, 파사포트)을 모두 결합해 주세요! 🚀`);
+    alert(`아직 로켓 부품이 남았어요! (${installedPartsCount}/4)\n4개 부품을 모두 결합해 주세요! 🚀`);
     return;
   }
   launchAssembledRocketUpward();
 }
 
-/**
- * GNB 메인 메뉴 하단 드롭다운 인터랙션 (한국항공우주연구원 스타일)
- */
-document.addEventListener('DOMContentLoaded', () => {
-  const proHeader = document.querySelector('.pro-header');
-  const navLinks = document.querySelectorAll('.pro-nav a');
-  const megaColumns = document.querySelectorAll('.mega-column');
-  const megaPanel = document.querySelector('.mega-menu-panel');
-
-  if (!proHeader || !megaPanel) return;
-
-  let closeTimer = null;
-
-  const openDropdown = () => {
-    if (closeTimer) clearTimeout(closeTimer);
-    proHeader.classList.add('is-dropdown-open');
-  };
-
-  const closeDropdown = () => {
-    closeTimer = setTimeout(() => {
-      proHeader.classList.remove('is-dropdown-open');
-      navLinks.forEach(link => link.classList.remove('active'));
-      megaColumns.forEach(col => col.classList.remove('highlighted'));
-    }, 120);
-  };
-
-  // Header mouse enter / leave for overall dropdown visibility
-  proHeader.addEventListener('mouseenter', openDropdown);
-  proHeader.addEventListener('mouseleave', closeDropdown);
-
-  // Link specific hover highlights
-  navLinks.forEach(link => {
-    link.addEventListener('mouseenter', () => {
-      openDropdown();
-      const menuIndex = link.getAttribute('data-menu');
-
-      navLinks.forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-
-      megaColumns.forEach(col => {
-        if (col.getAttribute('data-index') === menuIndex) {
-          col.classList.add('highlighted');
-        } else {
-          col.classList.remove('highlighted');
-        }
-      });
-    });
-  });
-
-  // Column specific hover highlights syncing back to main nav
-  megaColumns.forEach(col => {
-    col.addEventListener('mouseenter', () => {
-      openDropdown();
-      const colIndex = col.getAttribute('data-index');
-
-      navLinks.forEach(link => {
-        if (link.getAttribute('data-menu') === colIndex) {
-          link.classList.add('active');
-        } else {
-          link.classList.remove('active');
-        }
-      });
-
-      megaColumns.forEach(c => c.classList.remove('highlighted'));
-      col.classList.add('highlighted');
-    });
-  });
-});
-
-/**
- * 한국항공우주연구원(KARI) 메인 R&D 쇼케이스 캐러셀 제어
- */
-const showcaseData = [
-  {
-    index: 1,
-    titleKo: "발사체",
-    titleEn: "Space Launch Vehicle",
-    desc: "한국항공우주연구원은 KSR-I(1993), KSR-II(1998), KSR-III(2002)을 통해 로켓 설계 및 제작 능력을 확보하였으며, 러시아와 국제협력으로 나로호 개발에 성공하여 우주발사체 기술과 경험을 축적했다. 이를 토대로 1.5톤급 실용위성을 발사할 수 있는 3단형 한국형발사체 누리호를 독자 개발하여, 2027년까지 반복 발사와 기술 민간 이전을 추진할 계획이며, 2032년 달 착륙선을 발사할 차세대발사체를 개발중에 있다."
-  },
-  {
-    index: 2,
-    titleKo: "인공위성",
-    titleEn: "Satellite System",
-    desc: "다목적실용위성(아리랑) 시리즈, 정지궤도복합위성(천리안 1호, 2A/2B호), 차세대중형위성 및 초소형위성군을 독자 개발하여 국토 관리, 기상·해양·환경 관측 및 국가 안보 필수 정보를 24시간 실시간 제공하고 있습니다."
-  },
-  {
-    index: 3,
-    titleKo: "우주탐사",
-    titleEn: "Deep Space Exploration",
-    desc: "대한민국 최초의 달 궤도선 다누리(KPLO)를 성공적으로 달 궤도에 안착시켜 심우주 항법과 통신 기술을 세계적으로 검증받았으며, 2030년대 독자 달 착륙선 및 심우주 탐사선을 통한 우주 영토 확장에 나섭니다."
-  },
-  {
-    index: 4,
-    titleKo: "항공기 & AAM",
-    titleEn: "Aviation Technology",
-    desc: "친환경 전기추진 수직이착륙 비행체(OPPAV), 고고도 장기체류 성층권 무인기, 스마트 틸트로터 무인기 등 차세대 미래 항공 모빌리티 및 국가 미래 항공 산업 핵심 기술을 선도합니다."
-  },
-  {
-    index: 5,
-    titleKo: "위성항법",
-    titleEn: "KPS Navigation System",
-    desc: "한반도 및 주변 영역에 초정밀 위치·시각 정보를 24시간 끊김없이 제공하기 위한 한국형 위성항법시스템(KPS) 인프라 구축과 차세대 PNT 기술 자립화를 추진하고 있습니다."
-  },
-  {
-    index: 6,
-    titleKo: "기술사업화 & 인프라",
-    titleEn: "Tech Transfer & Infra",
-    desc: "국가종합비행성능시험장 및 나로우주센터 등 세계적 수준의 연구장비와 우주 인프라를 민간에 개방하고, 항공우주 핵심 특허 기술이전을 통해 국내 우주항공 산업 생태계 경쟁력을 강화합니다."
-  }
-];
-
-let currentShowcaseIndex = 0;
-let showcaseAutoPlayTimer = null;
-let isShowcasePlaying = true;
-
-/* 3D WebGL Three.js Photorealistic Space Simulator Variables */
-let scene, camera, renderer, animationFrameId;
-let earthMesh, atmosphereMesh, satelliteSprite, pingLine, pingPulseMesh, starParticles;
-let antennaMesh, vesselMesh, aircraftMesh;
-let is3DSceneInitialized = false;
-let orbitTime = 0;
-
-/**
- * 핀포인트 스타필드 파티클용 원형 Alpha 텍스처
- */
-function createStarTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 64;
-  canvas.height = 64;
-  const ctx = canvas.getContext('2d');
-
-  const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  grad.addColorStop(0.35, 'rgba(56, 189, 248, 0.7)');
-  grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(32, 32, 32, 0, Math.PI * 2);
-  ctx.fill();
-
-  return new THREE.CanvasTexture(canvas);
-}
-
-/**
- * Three.js WebGL 3D 씬 초기화 (실사 우주 시뮬레이터 수준)
- */
-function initKPS3DScene() {
-  const canvas = document.getElementById('kps-3d-canvas');
-  const container = document.querySelector('.kari-showcase-section');
-  if (!canvas || !container || typeof THREE === 'undefined') return;
-
-  const width = container.clientWidth;
-  const height = container.clientHeight;
-
-  // 1. Scene, Camera & Renderer (Extreme Sharpness: window.devicePixelRatio)
-  scene = new THREE.Scene();
-
-  camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  camera.position.set(0, 0, 11);
-
-  renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    alpha: true,
-    antialias: true
-  });
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(window.devicePixelRatio); // 4. 극대화된 선명도 (Sharpness)
-
-  const textureLoader = new THREE.TextureLoader();
-
-  // 조명 설정
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-  scene.add(ambientLight);
-
-  const sunLight = new THREE.DirectionalLight(0x00f5d4, 1.3);
-  sunLight.position.set(12, 10, 10);
-  scene.add(sunLight);
-
-  const blueLight = new THREE.PointLight(0x38bdf8, 1.6, 40);
-  blueLight.position.set(-6, -4, 6);
-  scene.add(blueLight);
-
-  // 3. 심우주 배경 (Pinpoint Starfield - 3,000개 미세 3D 별빛 파티클)
-  const starCount = 3000;
-  const starPositions = new Float32Array(starCount * 3);
-  for (let i = 0; i < starCount * 3; i++) {
-    starPositions[i] = (Math.random() - 0.5) * 90;
-  }
-  const starGeo = new THREE.BufferGeometry();
-  starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-  const starMat = new THREE.PointsMaterial({
-    size: 0.08,
-    map: createStarTexture(),
-    transparent: true,
-    opacity: 0.85,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
-  starParticles = new THREE.Points(starGeo, starMat);
-  scene.add(starParticles);
-
-  // 1. 지구(Earth) 실사 텍스처 맵 매핑 ('img/earth02.jpg' 로드)
-  const earthRadius = 3.6;
-  const earthGeo = new THREE.SphereGeometry(earthRadius, 64, 64);
-  const earthTexture = textureLoader.load('img/earth02.jpg');
-  const earthMat = new THREE.MeshStandardMaterial({
-    map: earthTexture,
-    roughness: 0.8,
-    metalness: 0.1
-  });
-  earthMesh = new THREE.Mesh(earthGeo, earthMat);
-  earthMesh.position.set(-3.2, -2.2, -1.0);
-  earthMesh.rotation.x = 0.35;
-  scene.add(earthMesh);
-
-  // 지구 외곽 은은한 사이언 블루(#00F5D4) 대기광 림 라이트 (Atmosphere Glow)
-  const atmosGeo = new THREE.SphereGeometry(earthRadius * 1.04, 64, 64);
-  const atmosMat = new THREE.MeshBasicMaterial({
-    color: 0x00f5d4,
-    side: THREE.BackSide,
-    transparent: true,
-    opacity: 0.35,
-    blending: THREE.AdditiveBlending
-  });
-  atmosphereMesh = new THREE.Mesh(atmosGeo, atmosMat);
-  earthMesh.add(atmosphereMesh);
-
-  // 3. 궤도선 (매끄러운 3D 타원 곡선: LineBasicMaterial, color: #00F5D4, opacity: 0.35)
-  const ellipseCurveMain = new THREE.EllipseCurve(-1.5, -0.8, 5.6, 3.4, 0, 2 * Math.PI, false, 0);
-  const mainPoints = ellipseCurveMain.getPoints(160);
-  const mainOrbitGeo = new THREE.BufferGeometry().setFromPoints(mainPoints.map(p => new THREE.Vector3(p.x, p.y, 0)));
-  const mainOrbitMat = new THREE.LineBasicMaterial({
-    color: 0x00f5d4,
-    transparent: true,
-    opacity: 0.35
-  });
-  const mainOrbitLine = new THREE.Line(mainOrbitGeo, mainOrbitMat);
-  mainOrbitLine.rotation.x = Math.PI / 4;
-  mainOrbitLine.rotation.y = -Math.PI / 8;
-  scene.add(mainOrbitLine);
-
-  // 2. 인공위성 렌더링 방식 전면 교체 (THREE.Sprite & THREE.SpriteMaterial 빌보딩)
-  const satTexture = textureLoader.load('img/satellite.png');
-  const satSpriteMat = new THREE.SpriteMaterial({
-    map: satTexture,
-    transparent: true,
-    depthWrite: false
-  });
-  satelliteSprite = new THREE.Sprite(satSpriteMat);
-  satelliteSprite.scale.set(1.4, 1.4, 1);
-  scene.add(satelliteSprite);
-
-  // 지상국 & 모빌리티 네온 와이어프레임 아이콘 (안테나, 선박, 항공기)
-  const antennaGeo = new THREE.ConeGeometry(0.14, 0.25, 6);
-  const antennaMat = new THREE.MeshBasicMaterial({ color: 0x00f5d4, wireframe: true });
-  antennaMesh = new THREE.Mesh(antennaGeo, antennaMat);
-  antennaMesh.position.set(-1.8, -0.6, 1.8);
-  scene.add(antennaMesh);
-
-  const vesselGeo = new THREE.BoxGeometry(0.2, 0.08, 0.1);
-  const vesselMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
-  vesselMesh = new THREE.Mesh(vesselGeo, vesselMat);
-  vesselMesh.position.set(-0.8, -2.4, 2.2);
-  scene.add(vesselMesh);
-
-  const aircraftGeo = new THREE.ConeGeometry(0.12, 0.3, 4);
-  const aircraftMat = new THREE.MeshBasicMaterial({ color: 0xffb703, wireframe: true });
-  aircraftMesh = new THREE.Mesh(aircraftGeo, aircraftMat);
-  aircraftMesh.position.set(-3.5, 0.4, 2.0);
-  aircraftMesh.rotation.z = -Math.PI / 4;
-  scene.add(aircraftMesh);
-
-  // 3. 한반도 지상국 ↔ 위성 점선 통신 핑(Ping Line) 애니메이션
-  const pingLineGeo = new THREE.BufferGeometry();
-  const pingLineMat = new THREE.LineDashedMaterial({
-    color: 0x00f5d4,
-    dashSize: 0.25,
-    gapSize: 0.15,
-    transparent: true,
-    opacity: 0.8
-  });
-  pingLine = new THREE.Line(pingLineGeo, pingLineMat);
-  scene.add(pingLine);
-
-  // 펄스 이동 파티클 구체
-  const pulseGeo = new THREE.SphereGeometry(0.09, 16, 16);
-  const pulseMat = new THREE.MeshBasicMaterial({ color: 0x00f5d4 });
-  pingPulseMesh = new THREE.Mesh(pulseGeo, pulseMat);
-  scene.add(pingPulseMesh);
-
-  // 렌더링 애니메이션 루프
-  let pulseProgress = 0;
-
-  function renderLoop() {
-    animationFrameId = requestAnimationFrame(renderLoop);
-
-    // 1. 지구 자전 (Y축 rotation.y += 0.001)
-    if (earthMesh) {
-      earthMesh.rotation.y += 0.001;
-    }
-
-    // 핀포인트 우주 별자리 미동
-    if (starParticles) {
-      starParticles.rotation.y += 0.0002;
-    }
-
-    // 2. 궤도를 따라 이동하는 위성 위치 & 원근감 원근 scale 조절
-    orbitTime += 0.0042;
-    const t = (orbitTime % (2 * Math.PI));
-    const pointOnCurve = ellipseCurveMain.getPoint(t / (2 * Math.PI));
-
-    const satPos = new THREE.Vector3(pointOnCurve.x, pointOnCurve.y, 0);
-    satPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 4);
-    satPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 8);
-
-    if (satelliteSprite) {
-      satelliteSprite.position.copy(satPos);
-      // 원근감(Perspective Distance)에 따른 자율 Scale 조절
-      const perspectiveScale = 1.35 + (satPos.z * 0.14);
-      satelliteSprite.scale.set(perspectiveScale, perspectiveScale, 1);
-    }
-
-    // 3. 지상국 좌표 ↔ 위성 점선 통신 핑 연동
-    const koreaBasePos = new THREE.Vector3(-1.8, -0.6, 1.8);
-
-    if (pingLine && satelliteSprite) {
-      const positions = new Float32Array([
-        koreaBasePos.x, koreaBasePos.y, koreaBasePos.z,
-        satelliteSprite.position.x, satelliteSprite.position.y, satelliteSprite.position.z
-      ]);
-      pingLine.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      pingLine.geometry.attributes.position.needsUpdate = true;
-    }
-
-    // 펄스 이동 파티클
-    pulseProgress = (pulseProgress + 0.016) % 1;
-    if (pingPulseMesh && satelliteSprite) {
-      pingPulseMesh.position.lerpVectors(koreaBasePos, satelliteSprite.position, pulseProgress);
-    }
-
-    renderer.render(scene, camera);
-  }
-
-  renderLoop();
-  is3DSceneInitialized = true;
-
-  window.addEventListener('resize', handleResize);
-}
-
-function handleResize() {
-  const container = document.querySelector('.kari-showcase-section');
-  if (!container || !renderer || !camera) return;
-
-  const width = container.clientWidth;
-  const height = container.clientHeight;
-
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(width, height);
-}
-
-function updateShowcaseUI(index) {
-  const slides = document.querySelectorAll('.showcase-slide');
-  const counterEl = document.getElementById('showcaseCurIndex');
-  const hudContentEl = document.getElementById('hudCardContent');
-  const showcaseSec = document.querySelector('.kari-showcase-section');
-
-  if (!slides.length || !hudContentEl) return;
-
-  slides.forEach((s, idx) => {
-    if (idx === index) {
-      s.classList.add('active');
-    } else {
-      s.classList.remove('active');
-    }
-  });
-
-  if (counterEl) {
-    counterEl.textContent = index + 1;
-  }
-
-  // 3D/시네마틱 씬 전환 연동 (위성항법 Slide 5: index 4)
-  if (showcaseSec) {
-    if (index === 4) { // 위성항법 KPS
-      showcaseSec.classList.add('mode-3d');
-      const cinematicVid = document.getElementById('kps-cinematic-video');
-      if (cinematicVid) {
-        cinematicVid.currentTime = 0;
-        cinematicVid.play().catch(e => console.log('Autoplay prevented:', e));
-      }
-    } else {
-      showcaseSec.classList.remove('mode-3d');
-    }
-  }
-
-  const data = showcaseData[index];
-  if (data) {
-    hudContentEl.style.opacity = '0';
-    setTimeout(() => {
-      hudContentEl.innerHTML = `
-        <h3 class="hud-title">
-          <span class="hud-ko">${data.titleKo}</span>
-          <span class="hud-en">${data.titleEn}</span>
-        </h3>
-        <p class="hud-desc">${data.desc}</p>
-      `;
-      hudContentEl.style.opacity = '1';
-    }, 150);
-  }
-}
-
-function moveShowcaseSlide(direction) {
-  currentShowcaseIndex = (currentShowcaseIndex + direction + showcaseData.length) % showcaseData.length;
-  updateShowcaseUI(currentShowcaseIndex);
-  resetShowcaseAutoPlay();
-}
-
-function toggleShowcaseAutoPlay() {
-  const btn = document.getElementById('showcasePlayPauseBtn');
-  if (isShowcasePlaying) {
-    if (showcaseAutoPlayTimer) clearInterval(showcaseAutoPlayTimer);
-    isShowcasePlaying = false;
-    if (btn) btn.textContent = '▶';
-  } else {
-    startShowcaseAutoPlay();
-    isShowcasePlaying = true;
-    if (btn) btn.textContent = '||';
-  }
-}
-
-function startShowcaseAutoPlay() {
-  if (showcaseAutoPlayTimer) clearInterval(showcaseAutoPlayTimer);
-  showcaseAutoPlayTimer = setInterval(() => {
-    moveShowcaseSlide(1);
-  }, 5000);
-}
-
-function resetShowcaseAutoPlay() {
-  if (isShowcasePlaying) {
-    startShowcaseAutoPlay();
-  }
-}
-
-// Auto banner scroll logic
-let bannerInterval = null;
-let isBannerPlaying = true;
-
-function initBannerSlider() {
-  const track = document.querySelector('.banner-track');
-  const btnPrev = document.querySelector('.banner-ctrl-btn.btn-prev');
-  const btnNext = document.querySelector('.banner-ctrl-btn.btn-next');
-  const btnPlay = document.querySelector('.banner-ctrl-btn.btn-play-pause');
-
-  if (!track) return;
-
-  // Clone original items to prevent empty gaps and ensure continuous loop
-  const originalItems = Array.from(track.children);
-  if (originalItems.length === 0) return;
-
-  // Clear and replicate 5 times (enough to fill any desktop screen)
-  track.innerHTML = '';
-  for (let i = 0; i < 5; i++) {
-    originalItems.forEach(item => {
-      track.appendChild(item.cloneNode(true));
-    });
-  }
-
-  let isTransitioning = false;
-
-  function getItemWidth(item) {
-    const trackStyle = window.getComputedStyle(track);
-    const gap = parseInt(trackStyle.gap) || 40;
-    return item.offsetWidth + gap;
-  }
-
-  function moveNext() {
-    if (isTransitioning) return;
-    isTransitioning = true;
-
-    track.style.transition = 'transform 0.4s ease-in-out';
-    const firstItem = track.firstElementChild;
-    if (!firstItem) {
-      isTransitioning = false;
-      return;
-    }
-    const itemWidth = getItemWidth(firstItem);
-    track.style.transform = `translateX(-${itemWidth}px)`;
-
-    track.addEventListener('transitionend', function onTransitionEnd() {
-      track.style.transition = 'none';
-      track.appendChild(firstItem);
-      track.style.transform = 'translateX(0)';
-      isTransitioning = false;
-      track.removeEventListener('transitionend', onTransitionEnd);
-    }, { once: true });
-  }
-
-  function movePrev() {
-    if (isTransitioning) return;
-    isTransitioning = true;
-
-    track.style.transition = 'none';
-    const lastItem = track.lastElementChild;
-    if (!lastItem) {
-      isTransitioning = false;
-      return;
-    }
-    const itemWidth = getItemWidth(lastItem);
-    track.insertBefore(lastItem, track.firstElementChild);
-    track.style.transform = `translateX(-${itemWidth}px)`;
-
-    // Trigger layout reflow
-    track.offsetHeight;
-
-    track.style.transition = 'transform 0.4s ease-in-out';
-    track.style.transform = 'translateX(0)';
-
-    track.addEventListener('transitionend', function onTransitionEnd() {
-      isTransitioning = false;
-      track.removeEventListener('transitionend', onTransitionEnd);
-    }, { once: true });
-  }
-
-  function startAuto() {
-    if (bannerInterval) clearInterval(bannerInterval);
-    bannerInterval = setInterval(moveNext, 3000);
-  }
-
-  function stopAuto() {
-    if (bannerInterval) clearInterval(bannerInterval);
-  }
-
-  if (btnNext) {
-    btnNext.addEventListener('click', () => {
-      moveNext();
-      if (isBannerPlaying) {
-        startAuto();
-      }
-    });
-  }
-
-  if (btnPrev) {
-    btnPrev.addEventListener('click', () => {
-      movePrev();
-      if (isBannerPlaying) {
-        startAuto();
-      }
-    });
-  }
-
-  if (btnPlay) {
-    btnPlay.addEventListener('click', () => {
-      if (isBannerPlaying) {
-        stopAuto();
-        isBannerPlaying = false;
-        btnPlay.textContent = '▶';
-        btnPlay.setAttribute('aria-label', '재생');
-      } else {
-        isBannerPlaying = true;
-        startAuto();
-        btnPlay.textContent = '⏸';
-        btnPlay.setAttribute('aria-label', '정지');
-      }
-    });
-  }
-
-  if (isBannerPlaying) {
-    startAuto();
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  startShowcaseAutoPlay();
-  initBannerSlider();
-});
-
-/**
- * 키즈 모드 히어로 섹션 '출발하기 🚀' 발사 인터랙션 (Launch Sequence)
- */
-function launchKidsRocket() {
-  const btn = document.getElementById('kidsLaunchBtn');
-  const rocketWrapper = document.getElementById('kidsRocketWrapper');
-  const heroFrame = document.getElementById('kidsHeroFrame');
-  const storySection = document.getElementById('kidsStorySection');
-
-  if (!rocketWrapper || rocketWrapper.classList.contains('launching')) return;
-
-  // 1. 버튼 누름 효과 (Click Bounce)
-  if (btn) {
-    btn.classList.add('clicked');
-    setTimeout(() => btn.classList.remove('clicked'), 350);
-  }
-
-  // 1-2. 로켓 카운트다운 진동 (Shake 0.5s)
-  rocketWrapper.classList.add('shaking');
-
-  setTimeout(() => {
-    // 2. 발사 비행 애니메이션 (Fly Off Screen to Top-Right)
-    rocketWrapper.classList.remove('shaking');
-    rocketWrapper.classList.add('launching');
-    if (heroFrame) heroFrame.classList.add('launching');
-
-    // 3. 콘텐츠 뷰 자동 스크롤 (0.8초 딜레이 후 #kidsStorySection 스크롤)
-    setTimeout(() => {
-      if (storySection) {
-        storySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 800);
-
-    // 4. 2.0초 후 페이드아웃 시작 (탑에서 1.0초간 대기 후 0.5초간 투명화)
-    setTimeout(() => {
-      rocketWrapper.style.transition = 'opacity 0.5s ease';
-      rocketWrapper.style.opacity = '0';
-    }, 2000);
-
-    // 5. 로켓 원래 위치로 부드럽게 페이드인 복귀 (Reset after 2.5s)
-    setTimeout(() => {
-      rocketWrapper.style.transition = 'none';
-      rocketWrapper.classList.remove('launching');
-      if (heroFrame) heroFrame.classList.remove('launching');
-
-      setTimeout(() => {
-        rocketWrapper.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
-        rocketWrapper.style.opacity = '1';
-      }, 60);
-    }, 2500);
-
-  }, 500);
-}
-
-// Custom SF HUD Target Cursor Interaction
-document.addEventListener('DOMContentLoaded', () => {
-  const dot = document.getElementById('hudCursorDot');
-  const ring = document.getElementById('hudCursorRing');
-
-  if (!dot || !ring) return;
-
-  let mouseX = 0, mouseY = 0;
-  let ringX = 0, ringY = 0;
-  let isMouseMoved = false;
-
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-
-    if (!isMouseMoved) {
-      isMouseMoved = true;
-      dot.style.display = 'block';
-      ring.style.display = 'flex';
-    }
-
-    // Move the dot instantly (hardware accelerated transform)
-    dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate3d(-50%, -50%, 0)`;
-  });
-
-  // Smooth lag for the outer ring using requestAnimationFrame
-  function animateRing() {
-    // Linear interpolation (lerp) for smooth lag trailing effect
-    const dx = mouseX - ringX;
-    const dy = mouseY - ringY;
-    ringX += dx * 0.15;
-    ringY += dy * 0.15;
-
-    const isHovered = ring.classList.contains('hovered');
-    const scale = isHovered ? 1.5 : 1.0;
-
-    // Slow circular rotation speed (time-based)
-    const angle = (Date.now() / 16) % 360;
-
-    ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate3d(-50%, -50%, 0) scale(${scale}) rotate(${angle}deg)`;
-
-    requestAnimationFrame(animateRing);
-  }
-  requestAnimationFrame(animateRing);
-
-  // Global hover listener to scale outer ring on interactive elements
-  document.addEventListener('mouseover', (e) => {
-    const target = e.target;
-    // Hover targeting links, buttons, selects, bento sub cards, custom control buttons, or clickable pills
-    const isInteractive = target.closest('a, button, select, .bento-sub-card, .clickable, .showcase-ctrl-btn, .banner-ctrl-btn, [role="button"]');
-    if (isInteractive) {
-      ring.classList.add('hovered');
-    }
-  });
-
-  document.addEventListener('mouseout', (e) => {
-    const target = e.target;
-    const isInteractive = target.closest('a, button, select, .bento-sub-card, .clickable, .showcase-ctrl-btn, .banner-ctrl-btn, [role="button"]');
-    if (isInteractive) {
-      ring.classList.remove('hovered');
-    }
-  });
-});
-
-/**
- * 키즈 모드 전용 경고 모달 창 동적 생성 및 표시
- */
-function showKidsAlertModal(title, message) {
-  let overlay = document.getElementById('kidsAlertModal');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'kidsAlertModal';
-    overlay.className = 'kids-modal-overlay';
-
-    const box = document.createElement('div');
-    box.className = 'kids-modal-box';
-
-    const emoji = document.createElement('span');
-    emoji.className = 'kids-modal-emoji';
-    emoji.textContent = '⚠️';
-
-    const titleEl = document.createElement('h4');
-    titleEl.className = 'kids-modal-title';
-    titleEl.id = 'kidsModalTitle';
-
-    const descEl = document.createElement('p');
-    descEl.className = 'kids-modal-desc';
-    descEl.id = 'kidsModalDesc';
-
-    const btn = document.createElement('button');
-    btn.className = 'kids-modal-btn';
-    btn.textContent = '다시 조립해 볼래요! 🛠️';
-    btn.addEventListener('click', () => {
-      overlay.classList.remove('show');
-    });
-
-    box.appendChild(emoji);
-    box.appendChild(titleEl);
-    box.appendChild(descEl);
-    box.appendChild(btn);
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
-  }
-
-  // 텍스트 매핑
-  document.getElementById('kidsModalTitle').textContent = title;
-  document.getElementById('kidsModalDesc').innerHTML = message;
-
-  // 지연 후 모달 활성화 애니메이션 작동
-  setTimeout(() => {
-    overlay.classList.add('show');
-  }, 20);
-}
-
-/**
- * GSAP ScrollTrigger 메인 섹션 누리호 비디오 연속 반복 재생 & 핀(pin: true) 스크롤 확대 연출
- */
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const heroSection = document.querySelector('.pro-hero');
-    const heroVideo = document.querySelector('#heroNurihoVideo') || document.querySelector('.hero-bg-video');
-    const heroContent = document.querySelector('.hero-content');
-
-    if (heroSection && heroVideo) {
-      // 1. 동영상 무한 연속 반복 재생 (Continuous Loop Playback)
-      heroVideo.muted = true;
-      heroVideo.loop = true;
-      heroVideo.playsInline = true;
-
-      const startVideoLoop = () => {
-        heroVideo.muted = true;
-        heroVideo.play().catch(err => {
-          console.log("Autoplay unblock attempt:", err);
-        });
-      };
-      startVideoLoop();
-      document.addEventListener('click', startVideoLoop, { once: true });
-      document.addEventListener('scroll', startVideoLoop, { once: true });
-      document.addEventListener('touchstart', startVideoLoop, { once: true });
-
-      // 2. GSAP ScrollTrigger Pin & Scrub Zoom 애니메이션 (동영상 연속 재생 중 스크롤 시 화면 확대)
-      const heroTl = gsap.timeline({
-        scrollTrigger: {
-          id: "heroScrollTrigger",
-          trigger: heroSection,
-          start: 'top top',
-          end: '+=150%',
-          pin: true,
-          scrub: true, // 스크롤 양에 맞춰 화면 확대
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const progress = self.progress;
-            
-            // 1. Status 갱신
-            let statusStr = "점화 대기";
-            if (progress >= 0.2 && progress < 0.5) statusStr = "1단 연소";
-            else if (progress >= 0.5 && progress < 0.8) statusStr = "MECO & 단 분리";
-            else if (progress >= 0.8) statusStr = "궤도 안착";
-            
-            const statusEl = document.getElementById('heroStatusVal');
-            updateTelemetryVal(statusEl, statusStr);
-
-            // 2. Altitude 갱신
-            const altEl = document.getElementById('heroAltVal');
-            const altVal = (progress * 700.0).toFixed(1) + " KM";
-            updateTelemetryVal(altEl, altVal);
-
-            // 3. Velocity 갱신
-            const velEl = document.getElementById('heroVelVal');
-            const velVal = (progress * 7.5).toFixed(2) + " KM/S";
-            updateTelemetryVal(velEl, velVal);
-
-            // 4. 우측 챕터 인디케이터 도트 활성화 싱크
-            updateMissionTimelineDots(progress);
-
-            // 5. 스크롤 진행률에 따라 시각 장애인 음성 대체 텍스트 전달
-            let statusText = "누리호가 발사대에서 대기하고 있습니다.";
-            if (progress >= 0.2 && progress < 0.5) {
-              statusText = "1단 엔진이 힘차게 연소하며 고도 40킬로미터로 수직 상승하고 있습니다.";
-            } else if (progress >= 0.5 && progress < 0.8) {
-              statusText = "메인 엔진 연소가 정지되고, 1단이 성공적으로 분리되었습니다. 2단 엔진 점화.";
-            } else if (progress >= 0.8) {
-              statusText = "3단 위성 보호 페어링이 완전히 열리며 차세대 실용위성을 지정된 우주 궤도에 안착시켰습니다. 발사 임무가 완수되었습니다.";
-            }
-            const srLiveStatus = document.getElementById('srLiveStatus');
-            if (srLiveStatus && srLiveStatus.textContent !== statusText) {
-              srLiveStatus.textContent = statusText;
-            }
-          }
-        }
-      });
-
-      // 스크롤 양에 맞춰 연속 재생 중인 비디오 화면 확대 (scale 1.0 -> 1.85)
-      heroTl.to(heroVideo, {
-        scale: 1.85,
-        ease: 'none',
-      }, 0);
-
-      // 메인 히어로 텍스트 카드 시각적 연출 (페이드 & 미세 상승)
-      if (heroContent) {
-        heroTl.to(heroContent, {
-          opacity: 0.25,
-          y: -40,
-          scale: 0.95,
-          ease: 'none',
-        }, 0);
-      }
-    }
-  }
-});
-
-/**
- * 누리호 3D 가상 발사 시뮬레이션 모달 열기 & 스크롤-스크러빙(Scroll Scrubbing) 프레임 제어
- */
-function openNurihoSimModal() {
-  const modal = document.getElementById('nurihoSimModal');
-  const video = document.getElementById('modalNurihoVideo');
-  const scrollBody = document.getElementById('nurihoModalScrollBody');
-  const scrubTrack = document.getElementById('scrubProgressTrack');
-
-  if (!modal || !video || !scrollBody) return;
-
-  // 1. 모달 활성화 및 바디 스크롤 락
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
-  scrollBody.scrollTop = 0;
-
-  // 2. 비디오 준비 및 디코더 락 해제 (Audio Muted & Prime)
-  video.muted = true;
-  video.pause();
-  video.play().then(() => {
-    video.pause();
-    updateModalScrub();
-  }).catch(() => { });
-
-  const formatTime = (seconds) => {
-    if (isNaN(seconds)) return "00:00.00";
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    const ms = Math.floor((seconds % 1) * 100);
-    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
-  };
-
-  const updateModalScrub = () => {
-    const maxScroll = scrollBody.scrollHeight - scrollBody.clientHeight;
-    if (maxScroll <= 0) return;
-
-    const progress = Math.max(0, Math.min(1, scrollBody.scrollTop / maxScroll));
-    const duration = video.duration || 10;
-
-    // 프레임 단위 비디오 타임 실시간 제어
-    if (video.duration && !isNaN(video.duration)) {
-      video.currentTime = progress * duration;
-    }
-
-    // 프로그레스 바 & 타임 텍스트 업데이트
-    const fill = document.getElementById('scrubProgressFill');
-    if (fill) fill.style.width = (progress * 100) + '%';
-
-    const curTimeEl = document.getElementById('scrubTimeCur');
-    const totalTimeEl = document.getElementById('scrubTimeTotal');
-    if (curTimeEl) curTimeEl.textContent = formatTime(progress * duration);
-    if (totalTimeEl) totalTimeEl.textContent = formatTime(duration);
-
-    // 텔레메트리 HUD 실시간 연동 (고도, 속도, 비행단계)
-    const altEl = document.getElementById('nurihoAltVal');
-    const velEl = document.getElementById('nurihoVelVal');
-    const stageEl = document.getElementById('nurihoStageVal');
-
-    if (altEl) altEl.textContent = (progress * 700).toFixed(1) + ' KM';
-    if (velEl) velEl.textContent = (progress * 7.5).toFixed(2) + ' KM/S';
-
-    if (stageEl) {
-      if (progress < 0.25) {
-        stageEl.textContent = "1단 클러스터링 엔진 점화 및 대기권 상승";
-        stageEl.className = "val cyan";
-      } else if (progress < 0.45) {
-        stageEl.textContent = "1단 분리 & 2단 엔진 점화 (고도 60km)";
-        stageEl.className = "val sky";
-      } else if (progress < 0.65) {
-        stageEl.textContent = "위성 페어링 분리 & 음속 돌파";
-        stageEl.className = "val green";
-      } else if (progress < 0.85) {
-        stageEl.textContent = "2단 분리 & 3단 엔진 점화 (우주 궤도 진입)";
-        stageEl.className = "val sky";
-      } else {
-        stageEl.textContent = "차세대 소형위성 2호 궤도 사출 완수 ✨";
-        stageEl.className = "val cyan";
-      }
-    }
-  };
-
-  // 모달 영역 내 마우스 휠 스크롤 감지 및 프레임 스크러빙 1:1 연동 (세밀한 스크럽 구간 확대)
-  modal.onwheel = (e) => {
-    e.preventDefault();
-    scrollBody.scrollTop += e.deltaY * 0.7;
-    updateModalScrub();
-  };
-
-  // 스크롤 바 직접 탐색 시 이벤트 연결
-  scrollBody.onscroll = updateModalScrub;
-
-  // 프로그레스 트랙 직접 클릭 시 해당 프레임으로 가속 이동
-  if (scrubTrack) {
-    scrubTrack.onclick = (e) => {
-      const rect = scrubTrack.getBoundingClientRect();
-      const clickRatio = (e.clientX - rect.left) / rect.width;
-      const maxScroll = scrollBody.scrollHeight - scrollBody.clientHeight;
-      scrollBody.scrollTop = clickRatio * maxScroll;
-      updateModalScrub();
-    };
-  }
-
-  // 초기 1회 프레임 업데이트
-  if (video.readyState >= 1) {
-    updateModalScrub();
-  } else {
-    video.onloadedmetadata = updateModalScrub;
-  }
-}
-
-/**
- * 누리호 3D 가상 발사 시뮬레이션 모달 닫기
- */
-function closeNurihoSimModal() {
-  const modal = document.getElementById('nurihoSimModal');
-  const video = document.getElementById('modalNurihoVideo');
-
-  if (modal) {
-    modal.classList.remove('active');
-    modal.onwheel = null;
-  }
-  if (video) video.pause();
-  document.body.style.overflow = '';
-}
-
-// 전역 window 객체 노출 (HTML onclick 핸들러 접근성 보장)
-window.openNurihoSimModal = openNurihoSimModal;
-window.closeNurihoSimModal = closeNurihoSimModal;
-
-// DOM 로드 완료 후 버튼 클릭 이벤트 리스너 자동바인딩
-document.addEventListener('DOMContentLoaded', () => {
-  const ctaBtns = document.querySelectorAll('.pro-cta-btn');
-  ctaBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openNurihoSimModal();
-    });
-  });
-
-  const satBento = document.getElementById('bento-satellite');
-  if (satBento) {
-    satBento.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openSatelliteModal();
-    });
-  }
-
-  // AI 챗봇 아바타 및 버튼 이벤트 수동 바인딩
-  const aiTrigger = document.getElementById('aiBotTrigger');
-  const openHeroChatBtn = document.getElementById('openHeroChatBtn');
-  if (aiTrigger) {
-    aiTrigger.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openKariChatModal();
-    });
-  }
-  if (openHeroChatBtn) {
-    openHeroChatBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openKariChatModal();
-    });
-  }
-});
-
-// ESC 키 입력 시 모달 닫기
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeNurihoSimModal();
-    closeSatelliteModal();
-    closeKariChatModal();
-  }
-});
 // ==========================================
-// Hero Canvas Scroll Scrubbing
+// Hero Canvas Scroll Scrubbing & Hotspot 연동
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   initHeroCanvasScrubber();
   initBentoCardInteractions();
   initKidsStarTrail();
+  initBentoSlideIn();
 });
 
 function initHeroCanvasScrubber() {
@@ -1599,39 +545,30 @@ function initHeroCanvasScrubber() {
   const statusEl = document.getElementById('heroStatusVal');
   const altEl = document.getElementById('heroAltVal');
 
-  // 추출한 이미지 총 장수 (200장 기준)
   const frameCount = 200;
-
-  // 이미지 파일 경로 매핑
   const currentFrame = index =>
     `img/nuri_frames/ezgif-frame-${String(index + 1).padStart(3, '0')}.jpg`;
 
   const images = [];
   const playhead = { frame: 0 };
 
-  // 캔버스 크기 브라우저 화면에 맞추기 (DPR 대응 고해상도 적용)
   function resizeCanvas() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
     canvas.style.width = '100vw';
     canvas.style.height = '100vh';
-    
-    // context 배율 적용
+
     ctx.scale(dpr, dpr);
-    
-    // 이미지 스무딩 품질 최상으로 보정
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    
+
     renderFrame(playhead.frame);
   }
 
-  // 캔버스에 이미지 그리기 (화면 꽉 차게 비율 유지)
   function renderFrame(index) {
     let img = images[index];
 
-    // 만약 현재 프레임 이미지가 로드되지 않았다면 이전 프레임 중 로드된 가장 가까운 이미지 사용
     if (!img || !img.complete) {
       for (let i = index - 1; i >= 0; i--) {
         if (images[i] && images[i].complete) {
@@ -1640,16 +577,9 @@ function initHeroCanvasScrubber() {
         }
       }
     }
-
-    // 이전 프레임도 없다면 첫 번째 프레임 사용
-    if (!img || !img.complete) {
-      img = images[0];
-    }
-
-    // 첫 프레임조차도 로드가 안 되었으면 그리지 않고 리턴
+    if (!img || !img.complete) img = images[0];
     if (!img || !img.complete) return;
 
-    // scale(dpr, dpr) 상태이므로, 클리어와 그리기 크기는 스타일(논리) 영역 기준 크기로 수행
     const logicalWidth = window.innerWidth;
     const logicalHeight = window.innerHeight;
     ctx.clearRect(0, 0, logicalWidth, logicalHeight);
@@ -1659,7 +589,7 @@ function initHeroCanvasScrubber() {
     let drawW, drawH, drawX, drawY;
 
     if (canvasRatio > imgRatio) {
-      drawW = logicalWidth * 1.06; // 6% 오버스캔 (생성형 AI 워터마크 크롭 숨김)
+      drawW = logicalWidth * 1.06;
       drawH = (logicalWidth / imgRatio) * 1.06;
       drawX = (logicalWidth - drawW) / 2;
       drawY = (logicalHeight - drawH) / 2;
@@ -1673,193 +603,129 @@ function initHeroCanvasScrubber() {
     ctx.drawImage(img, drawX, drawY, drawW, drawH);
   }
 
-  // 이미지 150장 메모리에 미리 불러오기 (Preload)
   let loadedCount = 0;
   for (let i = 0; i < frameCount; i++) {
     const img = new Image();
     img.src = currentFrame(i);
     img.onload = () => {
       loadedCount++;
-      if (loadedCount === 1) {
-        resizeCanvas(); // 첫 프레임 즉시 표시
-      }
+      if (loadedCount === 1) resizeCanvas();
     };
     images.push(img);
   }
 
   window.addEventListener('resize', resizeCanvas);
 
-  // GSAP 스크롤 연동
-  // GSAP ScrollTrigger 완전 고정 및 자연스러운 전환 설정
+  // GSAP ScrollTrigger 통합 스크러빙 & 핫스팟 제어
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 
-    // 1. playhead 프레임 제어 트윈
     gsap.to(playhead, {
       frame: frameCount - 1,
       ease: "none",
       scrollTrigger: {
+        id: "heroScrollTrigger",
         trigger: "#heroScrubSection",
-        start: "top top",         // 섹션 상단이 뷰포트 천장에 닿는 순간 고정 시작
-        end: "+=5000",             // 스크롤 가상 거리 (5000px 동안 화면을 완벽 고정)
-        pin: true,                 // 화면 고정 (아래 콘텐츠가 올라오지 못하게 잠금)
-        pinSpacing: true,          // 고정된 거리만큼의 여백을 생성해 다음 섹션과 겹침 방지
-        scrub: 1.2,                // 스크롤 반응 민첩도 (체감 속도를 묵직하고 부드럽게 보간)
-        anticipatePin: 1,          // 핀 고정 시 덜컹거림/밀림 현상 완벽 방지
+        start: "top top",
+        end: "+=4000",
+        pin: true,
+        pinSpacing: true,
+        scrub: 0.8,
+        anticipatePin: 1,
+        // GSAP pin이 부모에 주입하는 overflow:hidden 제거 → 하단 섹션 스크롤바 방지
+        onPin: () => {
+          const pinWrapper = document.querySelector('.gsap-marker-scroller-start, [data-gsap-pin]');
+          if (pinWrapper) pinWrapper.style.overflow = 'visible';
+          // pin 대상 부모 체인도 클리어
+          let el = document.getElementById('heroScrubSection');
+          while (el && el !== document.body) {
+            const style = window.getComputedStyle(el);
+            if (style.overflow === 'hidden') el.style.overflowY = 'visible';
+            el = el.parentElement;
+          }
+        },
+        onUnpin: () => {
+          // unpin 후 bento section 스크롤바 확실히 제거
+          const research = document.getElementById('researchSection');
+          if (research) {
+            research.style.overflowY = 'visible';
+            research.style.height = 'auto';
+          }
+        },
         onUpdate: (self) => {
-          // 소수점 버림 처리로 정확한 프레임 렌더링
+          const progress = self.progress;
+
           const frameIdx = Math.min(frameCount - 1, Math.floor(playhead.frame));
           renderFrame(frameIdx);
 
-          // 스크롤 진행도(0.0 ~ 1.0)에 따른 텍스트 HUD 업데이트
-          const progress = self.progress;
-          if (altEl) {
-            altEl.innerText = (progress * 45.8).toFixed(1) + " KM";
+          if (altEl) altEl.innerText = (progress * 700.0).toFixed(1) + " KM";
+          const velEl = document.getElementById('heroVelVal');
+          if (velEl) velEl.innerText = (progress * 7.5).toFixed(2) + " KM/S";
+
+          let statusStr = "READY TO LAUNCH";
+          if (progress >= 0.15 && progress < 0.45) statusStr = "STAGE 1 IGNITION";
+          else if (progress >= 0.45 && progress < 0.75) statusStr = "MECO & SEPARATION";
+          else if (progress >= 0.75) statusStr = "ORBITAL INSERTION";
+          if (statusEl) statusEl.innerText = statusStr;
+
+          updateMissionTimelineDots(progress);
+
+          // 스크롤 구간별 핫스팟 노출 제어
+          let activeStage = null;
+          if (progress >= 0.12 && progress <= 0.38) {
+            activeStage = stagesData[0];
+          } else if (progress >= 0.42 && progress <= 0.68) {
+            activeStage = stagesData[1];
+          } else if (progress >= 0.72 && progress <= 0.98) {
+            activeStage = stagesData[2];
           }
-          if (statusEl) {
-            if (progress < 0.2) statusEl.innerText = "READY TO LAUNCH";
-            else if (progress < 0.5) statusEl.innerText = "STAGE 1 IGNITION";
-            else if (progress < 0.85) statusEl.innerText = "MAX-Q ACCELERATION";
-            else statusEl.innerText = "MECO & STAGE SEPARATION";
+
+          const hotspot = document.getElementById('scrubHotspot');
+          if (activeStage && hotspot) {
+            document.getElementById('hotspotTag').textContent = activeStage.tag;
+            document.getElementById('hotspotTitle').textContent = activeStage.title;
+            document.getElementById('hotspotDesc').textContent = activeStage.desc;
+
+            hotspot.setAttribute('data-active-index', activeStage.stageNum - 1);
+            hotspot.classList.add('is-visible');
+          } else if (hotspot) {
+            hotspot.classList.remove('is-visible');
           }
+
+
         }
       }
     });
   }
 }
 
-/**
- * RESEARCH FIELDS Bento Cards 3D 틸트, 스포트라이트, ScrollTrigger 애니메이션 구현
- */
 function initBentoCardInteractions() {
   const cards = document.querySelectorAll('.bento-card');
-  
   cards.forEach(card => {
-    // 3D 틸트 및 스포트라이트 좌표 계산
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
-      // CSS 변수 갱신으로 스포트라이트 마스크 광원 추적
+
       card.style.setProperty('--mouse-x', `${x}px`);
       card.style.setProperty('--mouse-y', `${y}px`);
-      
-      // 마우스가 카드 중앙에서부터 얼마나 떨어져 있는지에 따라 3D 회전 각도 산출 (최대 8도)
+
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
       const rotateX = ((centerY - y) / centerY) * 8;
       const rotateY = ((x - centerX) / centerX) * 8;
-      
-      // 마우스 오버 이동 시에는 지연(transition)을 제거하여 반응성 극대화
+
       card.style.transition = 'border-color 0.3s, box-shadow 0.3s';
       card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
     });
-    
-    // 마우스가 카드를 벗어날 때 부드럽게 원래 위치로 리셋
+
     card.addEventListener('mouseleave', () => {
       card.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s, box-shadow 0.3s';
       card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
     });
   });
-
-  // GSAP ScrollTrigger를 사용한 순차적 솟아오름 & 페이드인 효과
-  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
-
-    gsap.from(".bento-card", {
-      scrollTrigger: {
-        trigger: ".bento-grid",
-        start: "top 85%",
-        toggleActions: "play none none none"
-      },
-      y: 60,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: "power2.out"
-    });
-  }
 }
 
-/**
- * 1. 키즈 히어로 로켓 발사 연출 & 아래 우주 이야기로 스크롤 이동
- */
-function launchKidsRocket() {
-  const rocket = document.getElementById('kidsRocketWrapper');
-  const targetSection = document.getElementById('kidsStorySection');
-  const launchBtn = document.getElementById('kidsLaunchBtn');
-  
-  if (!rocket || rocket.classList.contains('launching')) return;
-
-  // 1. 발사 상태 활성화 (불꽃 뿜으며 하늘 위로 솟아오름)
-  rocket.classList.add('launching');
-  if (launchBtn) launchBtn.disabled = true;
-
-  // 2. 1.0초 후 스토리 섹션으로 부드럽게 스크롤
-  setTimeout(() => {
-    if (targetSection) {
-      targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, 1000);
-
-  // 3. 2.8초 후 화면 밖 로켓을 원래 조용한 상태로 부드럽게 리셋하여 제자리 복귀
-  setTimeout(() => {
-    rocket.style.transition = 'none'; // 연출 리셋 시 순간이동
-    rocket.style.transform = 'translateY(500px) scale(0.5)'; // 화면 아래에서 대기
-    
-    setTimeout(() => {
-      rocket.classList.remove('launching');
-      rocket.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)'; // 복귀 시 슬며시 위로 제자리 안착
-      rocket.style.transform = 'translateY(0) scale(1)';
-      
-      if (launchBtn) launchBtn.disabled = false;
-    }, 150);
-  }, 2800);
-}
-
-/**
- * 3. 조립 부품 스냅 별가루 파티클 요소 생성
- */
-function createSparkles(element) {
-  const rect = element.getBoundingClientRect();
-  const container = document.getElementById('view-kids');
-  if (!container) return;
-
-  // 8개의 별가루 사방 비산 생성
-  for (let i = 0; i < 8; i++) {
-    const star = document.createElement('span');
-    star.className = 'star-sparkle-fx';
-    star.innerText = ['✨', '⭐', '🎈', '🎉'][Math.floor(Math.random() * 4)];
-    
-    // 스크롤 및 창 위치 보정하여 절대 좌표 획득
-    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
-    const centerX = rect.left + rect.width / 2 + scrollX;
-    const centerY = rect.top + rect.height / 2 + scrollY;
-
-    star.style.left = `${centerX}px`;
-    star.style.top = `${centerY}px`;
-
-    // 사방으로 튕겨 나갈 랜덤 각도와 세기
-    const angle = Math.random() * Math.PI * 2;
-    const velocity = 40 + Math.random() * 50;
-    const tx = Math.cos(angle) * velocity;
-    const ty = Math.sin(angle) * velocity;
-
-    star.style.setProperty('--tx', `${tx}px`);
-    star.style.setProperty('--ty', `${ty}px`);
-
-    container.appendChild(star);
-
-    // 애니메이션이 완료되는 0.8초 후 요소 삭제
-    star.addEventListener('animationend', () => star.remove());
-  }
-}
-
-/**
- * 4. 키즈 모드 캔버스 별가루 마우스 트레일 구현
- */
 function initKidsStarTrail() {
   const canvas = document.getElementById('kidsStarTrailCanvas');
   const container = document.getElementById('view-kids');
@@ -1868,31 +734,24 @@ function initKidsStarTrail() {
   const ctx = canvas.getContext('2d');
   let particles = [];
 
-  // 컨테이너 레이아웃 스크롤 높이까지 커버하도록 캔버스 동적 해상도 지정
   function resizeCanvas() {
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
   }
-  
+
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-  
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(() => resizeCanvas());
-    ro.observe(container);
-  }
 
-  // 별 파티클 클래스
   class StarParticle {
     constructor(x, y) {
       this.x = x;
       this.y = y;
       this.size = Math.random() * 7 + 4;
       this.speedX = (Math.random() - 0.5) * 2.2;
-      this.speedY = (Math.random() - 0.5) * 2.2 - 0.8; // 중력 역행하여 은은하게 상승
-      this.color = `hsl(${Math.random() * 360}, 100%, 75%)`; // 다채로운 파스텔 무지개 HSL
+      this.speedY = (Math.random() - 0.5) * 2.2 - 0.8;
+      this.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
       this.alpha = 1;
-      this.decay = Math.random() * 0.02 + 0.015; // 자연스러운 소멸 속도
+      this.decay = Math.random() * 0.02 + 0.015;
       this.angle = Math.random() * Math.PI * 2;
       this.spin = (Math.random() - 0.5) * 0.08;
     }
@@ -1910,8 +769,7 @@ function initKidsStarTrail() {
       ctx.rotate(this.angle);
       ctx.globalAlpha = this.alpha;
       ctx.fillStyle = this.color;
-      
-      // 5각 별 그리기 공식
+
       ctx.beginPath();
       const spikes = 5;
       const outerRadius = this.size;
@@ -1939,43 +797,302 @@ function initKidsStarTrail() {
     }
   }
 
-  // 마우스 이동 시 별 생성 등록
   container.addEventListener('mousemove', (e) => {
-    // 뷰포트 상대좌표를 컨테이너 영역 크기로 보정
     const rect = container.getBoundingClientRect();
     const x = e.clientX - rect.left + container.scrollLeft;
     const y = e.clientY - rect.top + container.scrollTop;
-    
-    // 너무 과도한 파티클 생성 제한
-    if (Math.random() < 0.6) {
-      particles.push(new StarParticle(x, y));
-    }
+    if (Math.random() < 0.6) particles.push(new StarParticle(x, y));
   });
 
-  // 모바일/태블릿 터치 이동 시 별 생성 등록
-  container.addEventListener('touchmove', (e) => {
-    if (e.touches.length > 0) {
-      const rect = container.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left + container.scrollLeft;
-      const y = e.touches[0].clientY - rect.top + container.scrollTop;
-      particles.push(new StarParticle(x, y));
-    }
-  }, { passive: true });
-
-  // 루프 드로잉 함수
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
     particles = particles.filter(p => p.alpha > 0);
     particles.forEach(p => {
       p.update();
       p.draw();
     });
-
     requestAnimationFrame(animate);
   }
   animate();
 }
+
+// ==========================================
+// RESEARCH FIELDS 벤토 그리드 좌우 슬라이드-인 GSAP 애니메이션
+// ==========================================
+function initBentoSlideIn() {
+  // GSAP 또는 ScrollTrigger 미로드 환경 대비
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+  // ScrollTrigger 플러그인 등록
+  gsap.registerPlugin(ScrollTrigger);
+
+  const section = document.getElementById('researchSection');
+  if (!section) return;
+
+  const header   = section.querySelector('.bento-section-header');
+  const mainCard = section.querySelector('.bento-main-card');
+  const subCards = section.querySelectorAll('.bento-sub-card');
+
+  // 타겟 요소가 하나도 없으면 중단
+  if (!header && !mainCard && !subCards.length) return;
+
+  const bentoTL = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#researchSection',
+      start: 'top 75%',
+      toggleActions: 'play none none none',
+      once: true // 1회만 실행 (스크롤 역방향 재실행 방지)
+    }
+  });
+
+  // 1. 헤더 드롭다운
+  if (header) {
+    bentoTL.from(header, {
+      y: -24,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out'
+    });
+  }
+
+  // 2. 좌측 대형 카드: 왼쪽에서 슬라이드 인
+  if (mainCard) {
+    bentoTL.from(mainCard, {
+      x: -90,
+      opacity: 0,
+      duration: 0.9,
+      ease: 'power3.out'
+    }, header ? '-=0.3' : 0);
+  }
+
+  // 3. 우측 4개 서브 카드: 오른쪽에서 Stagger 슬라이드 인
+  if (subCards.length) {
+    bentoTL.from(subCards, {
+      x: 90,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.12,
+      ease: 'power3.out'
+    }, mainCard ? '-=0.7' : 0);
+  }
+}
+
+function createSparkles(element) {
+  const rect = element.getBoundingClientRect();
+  const container = document.getElementById('view-kids');
+  if (!container) return;
+
+  for (let i = 0; i < 8; i++) {
+    const star = document.createElement('span');
+    star.className = 'star-sparkle-fx';
+    star.innerText = ['✨', '⭐', '🎈', '🎉'][Math.floor(Math.random() * 4)];
+
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const centerX = rect.left + rect.width / 2 + scrollX;
+    const centerY = rect.top + rect.height / 2 + scrollY;
+
+    star.style.left = `${centerX}px`;
+    star.style.top = `${centerY}px`;
+
+    const angle = Math.random() * Math.PI * 2;
+    const velocity = 40 + Math.random() * 50;
+    star.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
+    star.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
+
+    container.appendChild(star);
+    star.addEventListener('animationend', () => star.remove());
+  }
+}
+
+// ==========================================
+// 핫스팟 상세 제원 모달 이벤트 제어
+// ==========================================
+window.openStageDetailModal = function () {
+  const hotspot = document.getElementById('scrubHotspot');
+  const modal = document.getElementById('stageDetailModal');
+  if (!hotspot || !modal) return;
+
+  const activeIdx = parseInt(hotspot.getAttribute('data-active-index') || '0', 10);
+  const data = stagesData[activeIdx];
+  if (!data) return;
+
+  document.getElementById('stageModalHeaderTitle').textContent = data.modalTitle;
+  document.getElementById('stageModalBodyText').textContent = data.longDesc;
+
+  modal.classList.add('is-open');
+  const closeBtn = document.getElementById('closeStageModalBtn');
+  if (closeBtn) closeBtn.focus();
+};
+
+window.closeStageDetailModal = function () {
+  const modal = document.getElementById('stageDetailModal');
+  if (!modal) return;
+  modal.classList.remove('is-open');
+  const trigger = document.getElementById('hotspotModalOpenBtn');
+  if (trigger) trigger.focus();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const openBtn = document.getElementById('hotspotModalOpenBtn');
+  if (openBtn) openBtn.addEventListener('click', window.openStageDetailModal);
+
+  const closeBtn = document.getElementById('closeStageModalBtn');
+  if (closeBtn) closeBtn.addEventListener('click', window.closeStageDetailModal);
+
+  const backdrop = document.getElementById('closeStageModalBackdrop');
+  if (backdrop) backdrop.addEventListener('click', window.closeStageDetailModal);
+
+  // Custom SF HUD Target Cursor Interaction 복원
+  const dot = document.getElementById('hudCursorDot');
+  const ring = document.getElementById('hudCursorRing');
+
+  if (dot && ring) {
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+    let isMouseMoved = false;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      if (!isMouseMoved) {
+        isMouseMoved = true;
+        dot.style.display = 'block';
+        ring.style.display = 'flex';
+      }
+
+      dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate3d(-50%, -50%, 0)`;
+    });
+
+    function animateRing() {
+      const dx = mouseX - ringX;
+      const dy = mouseY - ringY;
+      ringX += dx * 0.15;
+      ringY += dy * 0.15;
+
+      const isHovered = ring.classList.contains('hovered');
+      const scale = isHovered ? 1.5 : 1.0;
+      const angle = (Date.now() / 16) % 360;
+
+      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate3d(-50%, -50%, 0) scale(${scale}) rotate(${angle}deg)`;
+
+      requestAnimationFrame(animateRing);
+    }
+    requestAnimationFrame(animateRing);
+
+    // 대화형 요소들에 호버 시 링 크기 확대 연출
+    document.addEventListener('mouseover', (e) => {
+      const target = e.target;
+      const isInteractive = target.closest('a, button, select, .bento-sub-card, .clickable, .showcase-ctrl-btn, .banner-ctrl-btn, [role="button"], .btn-ctrl, .quick-question-chip');
+      if (isInteractive) {
+        ring.classList.add('hovered');
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const target = e.target;
+      const isInteractive = target.closest('a, button, select, .bento-sub-card, .clickable, .showcase-ctrl-btn, .banner-ctrl-btn, [role="button"], .btn-ctrl, .quick-question-chip');
+      if (isInteractive) {
+        ring.classList.remove('hovered');
+      }
+    });
+
+
+    // 인공위성 시스템 Bento Card 클릭 이벤트 복원
+    const satBento = document.getElementById('bento-satellite');
+    if (satBento) {
+      satBento.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        window.openSatelliteModal();
+      });
+    }
+
+    // GNB Mega Dropdown Menu Interaction
+    const header = document.querySelector('.pro-header');
+    const navLinks = document.querySelectorAll('.pro-nav a');
+    const megaPanel = document.querySelector('.mega-menu-panel');
+    const megaColumns = document.querySelectorAll('.mega-column');
+
+    if (header && megaPanel) {
+      let closeTimer = null;
+
+      const openDropdown = () => {
+        if (closeTimer) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+        header.classList.add('is-dropdown-open');
+      };
+
+      const closeDropdown = () => {
+        if (closeTimer) clearTimeout(closeTimer);
+        closeTimer = setTimeout(() => {
+          header.classList.remove('is-dropdown-open');
+          megaColumns.forEach(col => {
+            col.style.opacity = '1';
+            col.style.transform = 'translateY(0)';
+          });
+          navLinks.forEach(link => link.classList.remove('active'));
+        }, 150);
+      };
+
+      header.addEventListener('mouseenter', openDropdown);
+      header.addEventListener('mouseleave', closeDropdown);
+
+      navLinks.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+          openDropdown();
+          const menuIdx = link.getAttribute('data-menu');
+          
+          navLinks.forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+
+          if (menuIdx !== null) {
+            megaColumns.forEach(col => {
+              const colIdx = col.getAttribute('data-index');
+              if (colIdx === menuIdx) {
+                col.style.opacity = '1';
+                col.style.transform = 'translateY(-2px)';
+                col.style.transition = 'all 0.25s ease';
+              } else {
+                col.style.opacity = '0.35';
+                col.style.transform = 'translateY(0)';
+                col.style.transition = 'all 0.25s ease';
+              }
+            });
+          }
+        });
+      });
+
+      megaColumns.forEach(col => {
+        col.addEventListener('mouseenter', () => {
+          openDropdown();
+          const colIdx = col.getAttribute('data-index');
+          
+          navLinks.forEach(l => {
+            if (l.getAttribute('data-menu') === colIdx) {
+              l.classList.add('active');
+            } else {
+              l.classList.remove('active');
+            }
+          });
+
+          megaColumns.forEach(c => {
+            if (c === col) {
+              c.style.opacity = '1';
+              c.style.transform = 'translateY(-2px)';
+            } else {
+              c.style.opacity = '0.35';
+              c.style.transform = 'translateY(0)';
+            }
+          });
+        });
+      });
+    }
+  }
+});
 
 /**
  * ==========================================================================
@@ -2031,7 +1148,7 @@ function renderSatFrame(index) {
   const ctx = canvas.getContext('2d');
   let img = satImages[index];
 
-  // 프리로드가 완료되지 않은 경우에 대한 Fallback (가장 가까운 완료된 이미지 찾기)
+  // 프리로드가 완료되지 않은 경우에 대한 Fallback
   if (!img || !img.complete) {
     for (let i = index - 1; i >= 0; i--) {
       if (satImages[i] && satImages[i].complete) {
@@ -2061,7 +1178,6 @@ function renderSatFrame(index) {
     ctx.imageSmoothingQuality = 'high';
   }
 
-  // 캔버스 클리어 및 그리기
   ctx.clearRect(0, 0, logicalWidth, logicalHeight);
 
   const canvasRatio = logicalWidth / logicalHeight;
@@ -2069,7 +1185,7 @@ function renderSatFrame(index) {
   let drawW, drawH, drawX, drawY;
 
   if (canvasRatio > imgRatio) {
-    drawW = logicalWidth * 1.06; // 6% 오버스캔 (생성형 AI 워터마크 크롭 숨김)
+    drawW = logicalWidth * 1.06;
     drawH = (logicalWidth / imgRatio) * 1.06;
     drawX = (logicalWidth - drawW) / 2;
     drawY = (logicalHeight - drawH) / 2;
@@ -2086,7 +1202,10 @@ function renderSatFrame(index) {
 /**
  * 위성 모달 열기
  */
-function openSatelliteModal() {
+let satResetTimeout = null;
+let isSatResetting = false;
+
+window.openSatelliteModal = function() {
   const modal = document.getElementById('satelliteModal');
   const scrollBody = document.getElementById('satModalScrollBody');
   const stageText = document.getElementById('satStageText');
@@ -2096,36 +1215,34 @@ function openSatelliteModal() {
 
   if (!modal || !scrollBody) return;
 
-  // 1. 모달 활성화 및 바디 스크롤 락
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
   scrollBody.scrollTop = 0;
+  isSatResetting = false;
 
-  // 2. HUD 초기화
   if (statusVal) statusVal.textContent = "LOADING IMAGES...";
   if (progressText) progressText.textContent = "0%";
   if (progressFill) progressFill.style.width = '0%';
 
-  // 3. 이미지 프리로딩 완료 후 최초 렌더링 및 스크롤 연동 활성화
   preloadSatelliteImages(() => {
     if (statusVal) statusVal.textContent = "SYSTEM ACTIVE";
     renderSatFrame(0);
     updateSatScrub();
   });
 
-  const updateSatScrub = () => {
+  function updateSatScrub() {
+    if (isSatResetting) return;
+
     const maxScroll = scrollBody.scrollHeight - scrollBody.clientHeight;
     if (maxScroll <= 0) return;
 
     const progress = Math.max(0, Math.min(1, scrollBody.scrollTop / maxScroll));
     const currentFrameIndex = Math.min(satFrameCount - 1, Math.floor(progress * satFrameCount));
 
-    // 1:1 이미지 렌더링
     if (isSatImagesLoaded) {
       renderSatFrame(currentFrameIndex);
     }
 
-    // HUD 업데이트
     if (progressText) {
       progressText.textContent = Math.floor(progress * 100) + "%";
     }
@@ -2148,21 +1265,66 @@ function openSatelliteModal() {
         statusVal.className = "sat-val green";
       }
     }
-  };
 
-  // 모달 영역 내 마우스 휠 스크롤 감지 및 1:1 스크러빙
+    // 100% 완료 도달 감지 -> 자동 리플레이/처음으로 복귀 연출
+    if (progress >= 0.99 && !isSatResetting) {
+      isSatResetting = true;
+      if (statusVal) {
+        statusVal.textContent = "DISSOLUTION COMPLETED // RESTART IN 1S";
+        statusVal.className = "sat-val green";
+      }
+
+      satResetTimeout = setTimeout(() => {
+        if (typeof gsap !== 'undefined') {
+          gsap.to(scrollBody, {
+            scrollTop: 0,
+            duration: 1.6,
+            ease: "power2.inOut",
+            onUpdate: () => {
+              const currentProg = Math.max(0, Math.min(1, scrollBody.scrollTop / maxScroll));
+              const frame = Math.min(satFrameCount - 1, Math.floor(currentProg * satFrameCount));
+              renderSatFrame(frame);
+
+              if (progressText) progressText.textContent = Math.floor(currentProg * 100) + "%";
+              if (progressFill) progressFill.style.width = (currentProg * 100) + "%";
+              if (statusVal) statusVal.textContent = "AUTO REWINDING...";
+            },
+            onComplete: () => {
+              isSatResetting = false;
+              if (statusVal) {
+                statusVal.textContent = "SYSTEM ACTIVE";
+                statusVal.className = "sat-val green";
+              }
+              if (stageText) stageText.textContent = "[STAGE 1] 전력 공급계 - 태양전지판 전개 분해";
+            }
+          });
+        } else {
+          // Fallback
+          scrollBody.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => {
+            isSatResetting = false;
+            if (statusVal) {
+              statusVal.textContent = "SYSTEM ACTIVE";
+            }
+          }, 1000);
+        }
+      }, 1000);
+    }
+  }
+
   modal.onwheel = (e) => {
+    if (isSatResetting) {
+      e.preventDefault();
+      return;
+    }
     e.preventDefault();
     scrollBody.scrollTop += e.deltaY * 0.7;
     updateSatScrub();
   };
 
-  // 스크롤바 이동 시 바인딩
   scrollBody.onscroll = updateSatScrub;
-  
-  // 브라우저 리사이즈 시 대응
   window.addEventListener('resize', onSatCanvasResize);
-}
+};
 
 function onSatCanvasResize() {
   const modal = document.getElementById('satelliteModal');
@@ -2178,446 +1340,402 @@ function onSatCanvasResize() {
 /**
  * 위성 모달 닫기
  */
-function closeSatelliteModal() {
+window.closeSatelliteModal = function() {
   const modal = document.getElementById('satelliteModal');
+  const scrollBody = document.getElementById('satModalScrollBody');
   if (modal) {
     modal.classList.remove('active');
     modal.onwheel = null;
   }
+  if (satResetTimeout) {
+    clearTimeout(satResetTimeout);
+    satResetTimeout = null;
+  }
+  if (scrollBody && typeof gsap !== 'undefined') {
+    gsap.killTweensOf(scrollBody);
+  }
+  isSatResetting = false;
   document.body.style.overflow = '';
   window.removeEventListener('resize', onSatCanvasResize);
-}
-
-// 전역 window 노출
-window.openSatelliteModal = openSatelliteModal;
-window.closeSatelliteModal = closeSatelliteModal;
-
-/**
- * ==========================================================================
- * KARI Flight AI Chatbot System (Image-based Avatar Setup)
- * ==========================================================================
- */
-
-/**
- * 챗봇 모달 제어
- */
-function openKariChatModal() {
-  const modal = document.getElementById('kariChatModal');
-  if (modal) {
-    modal.classList.add('active');
-  }
-}
-
-function closeKariChatModal() {
-  const modal = document.getElementById('kariChatModal');
-  if (modal) {
-    modal.classList.remove('active');
-  }
-}
-
-// 퀵 질문 칩 클릭 처리
-function sendQuickQuestion(questionText) {
-  const input = document.getElementById('chatInputText');
-  if (input) {
-    input.value = questionText;
-    sendUserChatMessage();
-  }
-}
-
-// 유저 메시지 전송 및 AI 응답 처리
-function sendUserChatMessage() {
-  const input = document.getElementById('chatInputText');
-  const chatList = document.getElementById('chatMessagesList');
-  if (!input || !chatList) return;
-
-  const text = input.value.trim();
-  if (text === '') return;
-
-  // 1. 유저 메시지 말풍선 렌더링
-  appendChatMessage('user', text);
-  input.value = '';
-
-  // 2. 가짜 통신 딜레이 연출 (600ms) 후 AI 관제관 응답 출력
-  setTimeout(() => {
-    const aiResponse = getKariAIResponse(text);
-    appendChatMessage('ai', aiResponse);
-  }, 600);
-}
-
-// 말풍선 DOM 동적 렌더링 (AI 응답 시 타이핑 효과 적용)
-function appendChatMessage(sender, messageText) {
-  const chatList = document.getElementById('chatMessagesList');
-  if (!chatList) return;
-
-  const msgDiv = document.createElement('div');
-  msgDiv.className = `chat-message ${sender}-message`;
-
-  const bubble = document.createElement('div');
-  bubble.className = 'msg-bubble';
-  
-  // 마크다운 형태의 볼드 등 태그 일부 파싱 지원
-  let formattedText = messageText.replace(/\n/g, '<br>');
-  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-  const timestamp = document.createElement('span');
-  timestamp.className = 'msg-timestamp';
-  const now = new Date();
-  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  timestamp.textContent = sender === 'ai' ? `FLIGHT AI // ${timeStr}` : `USER // ${timeStr}`;
-
-  msgDiv.appendChild(bubble);
-  msgDiv.appendChild(timestamp);
-  chatList.appendChild(msgDiv);
-
-  if (sender === 'ai') {
-    bubble.innerHTML = '';
-    
-    // HTML 태그 파서 토큰화하여 순차 타이핑 처리 (태그 깨짐 방지)
-    const tokens = [];
-    let i = 0;
-    while (i < formattedText.length) {
-      if (formattedText[i] === '<') {
-        let tag = '';
-        while (i < formattedText.length && formattedText[i] !== '>') {
-          tag += formattedText[i];
-          i++;
-        }
-        tag += '>';
-        i++;
-        tokens.push({ type: 'tag', value: tag });
-      } else {
-        tokens.push({ type: 'text', value: formattedText[i] });
-        i++;
-      }
-    }
-
-    let tokenIndex = 0;
-    const typingSpeed = 12; // 타이핑 속도(ms)
-    
-    function typeToken() {
-      if (tokenIndex < tokens.length) {
-        const token = tokens[tokenIndex];
-        bubble.innerHTML += token.value;
-        tokenIndex++;
-        chatList.scrollTop = chatList.scrollHeight;
-        setTimeout(typeToken, token.type === 'tag' ? 0 : typingSpeed);
-      }
-    }
-    typeToken();
-  } else {
-    bubble.innerHTML = formattedText;
-  }
-
-  // 채팅 리스트 자동 스크롤
-  chatList.scrollTop = chatList.scrollHeight;
-}
-
-// 규칙 기반 시나리오 룰셋 응답 엔진
-function getKariAIResponse(userText) {
-  const text = userText.toLowerCase();
-
-  // 0-1. 누리호 75톤 엔진 구조 (전문 데이터 브리핑)
-  if (text.includes('75톤') || text.includes('엔진 구조') || text.includes('엔진실')) {
-    return `🚀 **누리호 75톤급 액체엔진 핵심 구조 브리핑**\n
-- **작동 방식**: 가스발생기 사이클 (Gas Generator Cycle)\n
-- **추진제**: 케로신(Jet A-1) 및 액체산소(LOX)\n
-- **터보펌프**: 연소실 내부로 고압의 추진제를 공급하는 엔진의 심장부로, 1분에 약 20,000회 초고속 회전\n
-- **재생냉각 구조**: 노즐 및 연소실 외벽에 차가운 케로신 연료를 흘려보내 연소실 가스 온도(약 3,300°C)를 냉각시키는 첨단 벽면 재생 구조 탑재\n\n
-*누리호 1단에는 이 75톤급 액체엔진 4기가 기하학적 클러스터링(Clustering)으로 결합하여 이륙 시 총 300톤의 추력을 발휘합니다.*`;
-  }
-
-  // 0-2. 아리랑 위성 광학 제원 (전문 데이터 브리핑)
-  if (text.includes('광학 제원') || text.includes('아리랑 위성') || text.includes('광학계')) {
-    return `🛰️ **다목적 실용위성 아리랑 7호 광학계 탑재체 제원**\n
-- **해상도**: 초고해상도 서브미터급 광학 카메라 탑재 (흑백 0.3m 이하, 컬러 1.2m 이하 정밀 지구관측)\n
-- **탑재 광학계**: 대구경 주반사경(Primary Mirror) 렌즈 및 고감도 CMOS 라인 센서\n
-- **적용 기술**: 지구 자전 및 위성 진행 속도에 의한 흔들림을 보정하는 고성능 비행 자세제어 및 실시간 고속 압축 전송 엔진\n
-- **임무 궤도**: 약 500~600km 고도의 태양동기 저궤도 회전\n\n
-*우측 RESEARCH FIELDS의 '인공위성 시스템' 카드를 터치하여 전체화면 쇼룸을 실행하시면 기체의 내부 전력/렌즈 구조를 정밀하게 분해 제어해 볼 수 있습니다.*`;
-  }
-
-  // 0-3. KARI 차세대 발사체 로드맵 (전문 데이터 브리핑)
-  if (text.includes('차세대 발사체') || text.includes('로드맵') || text.includes('dlv')) {
-    return `🔬 **KARI 차세대 발사체(DLV) 및 미래 우주 로드맵 브리핑**\n
-- **목표**: 2030년대 초반 첫 발사를 향해 도약하는 2단형 고성능 액체발사체 시스템\n
-- **엔진 구성**: 1단 100톤급 다단연소사이클 엔진 5기 클러스터링(500톤 추력), 2단 10톤급 다단연소엔진 1기\n
-- **핵심 기술**: 엔진 출력 조절(Throttling) 및 재점화 기술을 적용하여 향후 '발사체 재사용성(Reusability)'을 구현할 원천 기틀\n
-- **임무 역량**: 대형 인공위성 탑재 및 달 착륙선(약 1.8톤)을 심우주 달 전이 궤도(TLI)에 직접 도달시킬 수 있는 강력한 운송 능력\n\n
-*대한민국 항공우주연구원은 이 차세대 발사체 플랫폼을 기틀 삼아 독자적인 우주 영토 개척을 달성할 예정입니다.*`;
-  }
-
-  // 1. 누리호 제원 데이터
-  if (text.includes('누리호') || text.includes('제원') || text.includes('nuri')) {
-    return `🚀 **KSLV-II 누리호 주요 제원 안내**\n
-- **구분**: 3단형 액체엔진 우주발사체 (대한민국 독자 개발)\n
-- **전체 길이**: 47.2 m / 최대 직경: 3.5 m\n
-- **총 중량**: 200 t\n
-- **탑재체 성능**: 1.5톤급 실용위성을 600~800km 저궤도에 안착 가능\n
-- **엔진 구성**: 1단 75톤급 액체엔진 4기 클러스터링(300톤 추력), 2단 75톤급 액체엔진 1기, 3단 7톤급 액체엔진 1기입니다.\n\n
-*메인 화면을 스크롤하시면 1단계부터 3단계까지의 웅장한 가상 발사 시뮬레이션을 제어해 감상하실 수 있습니다!*`;
-  }
-
-  // 2. 인공위성 시스템 쇼룸
-  if (text.includes('위성') || text.includes('인공위성') || text.includes('쇼룸') || text.includes('분해') || text.includes('arirang') || text.includes('kompsat')) {
-    return `🛰️ **KOMPSAT 아리랑 인공위성 시스템 안내**\n
-- **대상 모델**: 다목적 실용위성(아리랑 7호 / KOMPSAT-7) 기체\n
-- **미션**: 초고해상도 광학 탑재체(EOS) 및 대구경 렌즈를 활용한 정밀 지구 관측\n
-- **조작 안내**: RESEARCH FIELDS 벤토 그리드 우측의 **'인공위성 시스템'** 카드를 터치하시면, 220프레임에 달하는 실시간 '3D 분해 및 정밀 조립 가상 쇼룸'이 열립니다. 스크롤 휠로 내부 전력 공급계, 렌즈계, 추력기 시스템을 정밀 분해해 보실 수 있습니다!`;
-  }
-
-  // 3. 발사 시퀀스
-  if (text.includes('발사') || text.includes('시퀀스') || text.includes('이륙') || text.includes('카운트다운') || text.includes('sim')) {
-    return `🔥 **KARI 발사 관제 자동 시퀀스 안내**\n
-- **준비 단계(PLD)**: 발사체 기립 및 최종 내부 시스템 자가 검사 수행\n
-- **자동 점화(PLOS)**: 카운트다운 10초 전 지상 관제 시스템에 의한 점화 명령 발송\n
-- **리프트오프(LIFTOFF)**: 75톤급 엔진 클러스터링 총 추력이 300톤을 돌파하는 시점에 고정장치(Hold-down) 락이 해제되며 하늘로 솟구쳐 오릅니다.\n\n
-*GNB 우측의 [시뮬레이터 시작 🚀] 버튼을 눌러 비행 과정을 실시간 입체적으로 모니터링해 보세요.*`;
-  }
-
-  // 4. KARI 항우연
-  if (text.includes('kari') || text.includes('항공우주연구원') || text.includes('항우연')) {
-    return `🏢 **KARI (한국항공우주연구원) 소개**\n
-- **KARI**는 대한민국의 항공우주 과학기술 개발을 전담하는 정부출연 연구기관입니다.\n
-- 독자적인 우주 발사체 기술(누리호), 세계 최고 수준의 저궤도 정밀 지구 관측 위성(아리랑/천리안 시리즈), 그리고 한국 최초의 달 궤도선(다누리)을 성공적으로 쏘아 올린 대한민국 과학기술의 심장부입니다.`;
-  }
-
-  // 4-2. 연구개발 분야
-  if (text.includes('연구') || text.includes('개발') || text.includes('분야') || text.includes('r&d')) {
-    return `🔬 **KARI 우주항공 연구개발(R&D) 핵심 영역 안내**\n
-- **우주 발사체**: 한국형 발사체 고도화 및 차세대 발사체 개발을 통한 완전한 우주 수송 능력 확보\n
-- **인공위성**: 다목적 실용위성(아리랑), 차세대 중형위성, 천리안 복합위성 등의 독자적 탑재체 및 본체 국산화 연구\n
-- **우주 탐사**: 최초의 달 궤도선 다누리에 이어 향후 달 착륙선 및 독자 행성 탐사 프로젝트 선행 개발 선도\n
-- **항공 혁신**: 친환경 미래 도심항공 교통(UAM), 무인 항공기 시스템 및 고고도 장기체공 태양광 무인기 원천 기술 개발\n\n
-*항우연은 최첨단 우주 영토 확장을 위해 다각도의 기초 핵심 R&D 분야를 전방위 육성하고 있습니다.*`;
-  }
-
-  // 5. 기본 환영 인사
-  if (text.includes('안녕') || text.includes('하이') || text.includes('반갑') || text.includes('hello')) {
-    return `👋 반갑습니다! KARI 비행 관제실의 비행 통제 지원 AI입니다. 무엇을 도와드릴까요?\n
-발사체 제원, 위성 쇼룸 정보, 또는 발사 통제 시스템에 대해 물어보시면 상세히 안내해 드리겠습니다.`;
-  }
-
-  // 6. 키즈 모드 칩 1: 로켓 조립해보기
-  if (text.includes('로켓 조립') || text.includes('조립해보기') || text.includes('조립 놀이')) {
-    return `🚀 **재미있는 로켓 조립 놀이!**\n
-키즈 모드 메인 화면 상단으로 가시면 **'3D 로켓 조립 연구소'**가 있답니다!\n
-1단계 **부스터(불꽃 엔진)** ➔ 2단계 **연료 탱크** ➔ 3단계 **페이로드(기계장치)** ➔ 4단계 **페어링(머리 부분)** 순서대로 하나씩 콕콕 눌러 결합해 보아요! 완성한 후 **[로켓 발사! 🚀]** 버튼을 누르면 하늘 높이 로켓이 날아간답니다!`;
-  }
-
-  // 7. 키즈 모드 칩 2: 우주 퀴즈 풀기
-  if (text.includes('우주 퀴즈') || text.includes('퀴즈 풀기') || text.includes('퀴즈')) {
-    return `⭐ **반짝반짝 우주 상식 퀴즈!**\n
-우주에서 가장 뜨거운 별은 태양일까요? 아니면 지구일까요?\n
-*정답은 당연히 활활 타오르는 **'태양'**이랍니다! 생각한 답을 채팅창에 적어 보거나, 아래 '재미있는 우주 이야기' 카드를 눌러 우주 상식을 더 넓혀 보세요!*`;
-  }
-
-  // 8. 키즈 모드 칩 3: 우주인은 밥을 어떻게 먹어?
-  if (text.includes('우주인') && (text.includes('밥') || text.includes('먹어') || text.includes('식사'))) {
-    return `👨‍🚀 **우주 비행사들의 신기한 밥 먹기!**\n
-우주선 안은 중력이 없어서(둥둥 뜨는 상태) 음식이나 물이 사방으로 날아다녀요!\n
-그래서 우주인들은 국물이나 밥을 숟가락으로 떠먹는 대신, **빨대가 달린 특수 튜브**에 든 퓨레를 짜 먹거나 한입에 쏙 들어가는 **건조 식량**을 물에 불려 먹는답니다. 물방울이 동동 떠다니면 손으로 쏙 잡아서 먹기도 해요! 신기하지 않나요?`;
-  }
-
-  // 기본 폴백 응답
-  return `🤖 **KARI Telemetry Database 원격 전송 완료**\n
-질문하신 내용과 연동된 최신 원격 데이터를 로드해 분석 중입니다.\n
-현재 관제실의 비행 시뮬레이터 시스템이 정상 가동 중입니다. 대한민국 우주 개발의 심장인 **누리호의 제원 정보, 위성 3D 분해 쇼룸 조작법, 발사 카운트다운 절차**에 대해 추가 질문해 주시면 성실히 지원해 드리겠습니다!`;
-}
-
-// 전역 window 객체 노출
-window.openSatelliteModal = openSatelliteModal;
-window.closeSatelliteModal = closeSatelliteModal;
-window.openKariChatModal = openKariChatModal;
-window.closeKariChatModal = closeKariChatModal;
-window.sendQuickQuestion = sendQuickQuestion;
-window.sendUserChatMessage = sendUserChatMessage;
-
-/**
- * ==========================================================================
- * Web Accessibility (A11y) Help & Dialogue Scripts
- * ==========================================================================
- */
-
-/**
- * 접근성 도구 모달 창 표시 및 토글
- */
-window.toggleA11yMenu = function() {
-  showA11yDialog(
-    "♿ KARI 웹 접근성 지원 센터",
-    `본 웹사이트는 시각 및 청각 장애인을 포함한 모든 사용자가 정보를 동등하게 탐색할 수 있도록 설계되었습니다.<br><br>
-    - **스크린 리더 지원**: 발사 궤적과 비행 텔레메트리가 음성 텍스트(#srLiveStatus)로 실시간 중계됩니다.<br>
-    - **키보드 내비게이션**: 마우스 없이 Tab키와 방향키(Arrow Up/Down)만으로 전체 사이트를 정밀 탐색할 수 있습니다.<br>
-    - **고대비 포커스**: 탭 이동 시 사이언색 테두리(:focus-visible)가 적용됩니다.<br>
-    - **모션 중지**: prefers-reduced-motion 설정을 켜시면 눈부신 스타버스트 워프 속도선이나 플로팅 애니메이션이 자동으로 정지됩니다.`
-  );
 };
 
-/**
- * 대체 텍스트 문서 모달 표시
- */
-window.readDetailedDesc = function(type) {
-  if (type === 'satellite') {
-    showA11yDialog(
-      "🛰️ 인공위성 시스템 대체 설명",
-      `**[시각 대체 텍스트 문서]**<br><br>
-      이 영역은 한국항공우주연구원이 개발하는 저궤도 정밀 지구 관측 실용위성(아리랑 시리즈) 및 정지궤도 복합위성(천리안 시리즈)을 소개하는 코너입니다.<br><br>
-      - **광학 탑재체**: 위성 상단부에는 서브미터급(0.3m급) 고밀도 관측용 대구경 반사경 카메라 렌즈계가 위치하고 있습니다.<br>
-      - **동력 제어부**: 좌우 양 날개에는 태양 에너지를 전력으로 변환하는 태양전지판 날개가 넓게 펼쳐져 있으며, 본체 중앙에는 자세 제어를 위한 추력기와 자이로스코프 시스템이 장착되어 지구 자전 속도에 맞춰 카메라 정밀도를 유지합니다.`
-    );
-  } else if (type === 'satellite-showroom') {
-    showA11yDialog(
-      "🛰️ KOMPSAT ARIRANG 분해/조립 쇼룸 대체 설명",
-      `**[정밀 분해/조립 가상 쇼룸 대체 설명]**<br><br>
-      사용자가 마우스 휠을 스크롤하여 위성의 220프레임에 달하는 실시간 해체 및 결합 시퀀스를 제어할 수 있는 가상 쇼룸 캔버스 영역입니다.<br><br>
-      - **스크롤 진행 0% ~ 30% [STAGE 1: SOLAR PANEL & BOOM]**: 태양전지판 날개 및 본체 외부 열제어 블랭킷이 바깥쪽으로 분리되며 전원 공급 보드 내부 회로가 노출됩니다.<br>
-      - **스크롤 진행 31% ~ 70% [STAGE 2: SENSOR & THRUSTER]**: 중앙 자세제어 컴퓨터 및 하단 단일 추진제 연료탱크, 추력 노즐 4기가 사방으로 확장 분해됩니다.<br>
-      - **스크롤 진행 71% ~ 100% [STAGE 3: OPTICAL LENS CAMERA]**: 위성 본체의 핵심인 초고해상도 광학 렌즈 장비와 주반사경 반사 경통이 앞쪽으로 길게 돌출 해체되며 렌즈 배치도와 감지 센서 레이아웃을 1:1 정밀 표출합니다.`
-    );
-  }
-};
-
-/**
- * 공통 접근성 정보 알림 다이알로그 팝업 생성
- */
-function showA11yDialog(title, contentHTML) {
-  let overlay = document.getElementById('a11yDialogModal');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'a11yDialogModal';
-    overlay.className = 'a11y-dialog-overlay';
-
-    const box = document.createElement('div');
-    box.className = 'a11y-dialog-box';
-
-    const titleEl = document.createElement('h4');
-    titleEl.className = 'a11y-dialog-title';
-    titleEl.id = 'a11yDialogTitle';
-
-    const bodyEl = document.createElement('div');
-    bodyEl.className = 'a11y-dialog-body';
-    bodyEl.id = 'a11yDialogBody';
-
-    const btn = document.createElement('button');
-    btn.className = 'a11y-close-btn';
-    btn.textContent = '닫기 ✕';
-    btn.addEventListener('click', () => {
-      overlay.classList.remove('show');
-      const trigger = document.querySelector('.a11y-tool-btn');
-      if (trigger) trigger.focus();
-    });
-
-    box.appendChild(titleEl);
-    box.appendChild(bodyEl);
-    box.appendChild(btn);
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
-  }
-
-  document.getElementById('a11yDialogTitle').innerHTML = title;
-  document.getElementById('a11yDialogBody').innerHTML = contentHTML;
-
-  overlay.classList.add('show');
-  setTimeout(() => {
-    const closeBtn = overlay.querySelector('.a11y-close-btn');
-    if (closeBtn) closeBtn.focus();
-  }, 50);
-}
-
-/**
- * 키보드 이벤트 보강 (ArrowUp/Down, PageUp/Down 입력 시 포커스 락 예방 및 부드러운 뷰포트 스크롤 제공)
- */
-window.addEventListener('keydown', (e) => {
-  const activeModal = document.querySelector('.sat-modal-overlay.active') || 
-                      document.querySelector('.nuriho-modal-overlay.active') || 
-                      document.querySelector('.chat-modal-overlay.active') ||
-                      document.querySelector('.a11y-dialog-overlay.show');
-  if (activeModal) return;
-
-  const scrollStep = 80;
-  if (e.key === 'ArrowDown') {
-    e.preventDefault();
-    window.scrollBy({ top: scrollStep, behavior: 'smooth' });
-  } else if (e.key === 'ArrowUp') {
-    e.preventDefault();
-    window.scrollBy({ top: -scrollStep, behavior: 'smooth' });
-  } else if (e.key === 'PageDown') {
-    e.preventDefault();
-    window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' });
-  } else if (e.key === 'PageUp') {
-    e.preventDefault();
-    window.scrollBy({ top: -window.innerHeight * 0.7, behavior: 'smooth' });
+// ESC 키로 위성 모달 닫기 바인딩
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    window.closeSatelliteModal();
   }
 });
 
 /**
  * ==========================================================================
- * Kids Mode Specific Accessibility (TTS & Toggle Switches)
+ * KARI AI FLIGHT ASSISTANT CHATBOT INTERACTION
  * ==========================================================================
  */
 
-let kidsUtterance = null;
+window.openKariChatModal = function() {
+  const modal = document.getElementById('kariChatModal');
+  if (modal) {
+    modal.classList.add('active');
+    const input = document.getElementById('chatInputText');
+    if (input) setTimeout(() => input.focus(), 100);
+  }
+};
+
+window.closeKariChatModal = function() {
+  const modal = document.getElementById('kariChatModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+};
+
+window.sendQuickQuestion = function(questionText) {
+  const input = document.getElementById('chatInputText');
+  if (input) {
+    input.value = questionText;
+    window.sendUserChatMessage();
+  }
+};
+
+window.sendUserChatMessage = function() {
+  const input = document.getElementById('chatInputText');
+  const chatMessagesList = document.getElementById('chatMessagesList');
+  if (!input || !chatMessagesList) return;
+
+  const userText = input.value.trim();
+  if (!userText) return;
+
+  // 1. 사용자 메시지 렌더링
+  const userMsgDiv = document.createElement('div');
+  userMsgDiv.className = 'chat-message user-message';
+  userMsgDiv.innerHTML = `
+    <div class="msg-bubble">${escapeHtml(userText)}</div>
+    <span class="msg-timestamp">${getFormattedTime()}</span>
+  `;
+  chatMessagesList.appendChild(userMsgDiv);
+  input.value = '';
+  scrollChatToBottom();
+
+  // 2. AI 타이핑 인디케이터 표시
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'chat-message ai-message typing-indicator-msg';
+  typingDiv.innerHTML = `
+    <div class="msg-bubble">
+      <div class="typing-loader">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <span class="msg-timestamp">ANALYZING QUERY...</span>
+  `;
+  chatMessagesList.appendChild(typingDiv);
+  scrollChatToBottom();
+
+  // 3. 비동기 답변 생성 (1000ms 지연)
+  setTimeout(() => {
+    const typingMsg = chatMessagesList.querySelector('.typing-indicator-msg');
+    if (typingMsg) typingMsg.remove();
+
+    const responseText = getAiChatbotResponse(userText);
+
+    const aiMsgDiv = document.createElement('div');
+    aiMsgDiv.className = 'chat-message ai-message';
+    aiMsgDiv.innerHTML = `
+      <div class="msg-bubble">${responseText}</div>
+      <span class="msg-timestamp">AI ASSISTANT SYSTEM</span>
+    `;
+    chatMessagesList.appendChild(aiMsgDiv);
+    scrollChatToBottom();
+  }, 1000);
+};
+
+// 테마 변경에 따라 챗봇 외견 변경
+window.updateChatbotTheme = function(themeName) {
+  const botAvatarImg = document.getElementById('botAvatarImg');
+  const dialogueText = document.getElementById('botDialogueText');
+  const actionBtn = document.getElementById('botActionBtn');
+
+  if (!botAvatarImg || !dialogueText || !actionBtn) return;
+
+  if (themeName === 'kids') {
+    botAvatarImg.src = botAvatarImg.getAttribute('data-kids') || 'img/robot02.jpg';
+    dialogueText.textContent = "안녕! 우주봇이야 🛰️";
+    actionBtn.textContent = "우주 로봇이랑 대화하기 🎈";
+  } else {
+    botAvatarImg.src = botAvatarImg.getAttribute('data-default') || 'img/robot.jpg';
+    dialogueText.textContent = "무엇을 도와드릴까요?";
+    actionBtn.textContent = "관제 AI와 대화하기 💬";
+  }
+};
+
+function scrollChatToBottom() {
+  const list = document.getElementById('chatMessagesList');
+  if (list) {
+    list.scrollTop = list.scrollHeight;
+  }
+}
+
+function getFormattedTime() {
+  const now = new Date();
+  const hr = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  return `${hr}:${min}`;
+}
+
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// 질문에 따른 AI 지식 매핑 답변 리포트
+function getAiChatbotResponse(query) {
+  const q = query.toLowerCase();
+  const isKids = document.body.classList.contains('kids-mode');
+
+  if (isKids) {
+    if (q.includes('누리호') && q.includes('엔진')) {
+      return `🚀 <strong>누리호 로켓 엔진 이야기</strong>:<br>
+      - <strong>힘센 심장</strong>: 누리호 로켓 엔진은 아주아주 강력한 불꽃을 내뿜는 쇠로 만든 심장이야!<br>
+      - <strong>75톤의 힘</strong>: 엔진 1개가 엄청 큰 코끼리 15마리를 한 번에 들어 올릴 만큼 아주 힘이 세단다!<br>
+      - <strong>엔진 4개 합체</strong>: 로켓 맨 아래에 이 엔진 4개가 힘을 합쳐서 총 300톤의 무서운 추진력으로 하늘 높이 날아올라!`;
+    }
+    if (q.includes('아리랑') || q.includes('위성')) {
+      return `🛰️ <strong>아리랑 인공위성 이야기</strong>:<br>
+      - <strong>우주 카메라</strong>: 아리랑 위성은 지구에서 700km나 떨어진 아주 높은 우주 상공에서 지구를 찰칵찰칵 선명하게 찍는 멋쟁이 카메라야!<br>
+      - <strong>태양빛 충전기</strong>: 파란색 날개처럼 생긴 태양전지판을 쫙 펴서 햇빛을 받으며 배터리를 충전한단다.`;
+    }
+    if (q.includes('로드맵') || q.includes('차세대')) {
+      return `🔬 <strong>앞으로의 차세대 우주 탐사선 계획</strong>:<br>
+      - <strong>더 튼튼한 로켓</strong>: KARI 삼촌들과 이모들은 지금보다 더 크고 더 힘이 센 새로운 로켓을 준비하고 있어!<br>
+      - <strong>달나라 여행</strong>: 2032년쯤에는 우리 손으로 만든 예쁜 우주선을 달나라 표면에 착륙시켜서 탐험할 계획이란다. 정말 멋지지?`;
+    }
+    if (q.includes('안녕') || q.includes('반갑')) {
+      return `안녕! 🚀 나는 우주봇이야! 누리호 로켓 엔진이나 인공위성에 대해 궁금한 게 있다면 아래 버튼을 누르거나 나에게 친근하게 물어봐줘!`;
+    }
+    return `🤖 <strong>우주봇이 알려줄게!</strong>:<br>
+    - 보내준 "${escapeHtml(query)}"에 대해 우주 컴퓨터로 열심히 찾아보고 있어!<br>
+    - 로켓 엔진 불꽃 놀이, 하늘을 나는 인공위성 카메라, 미래의 달나라 탐험선에 대해 질문해주면 아주 재미있게 들려줄게!`;
+  }
+
+  // 일반(프로) 모드일 때
+  if (q.includes('누리호') && q.includes('엔진')) {
+    return `🚀 <strong>누리호 75톤급 액체엔진 제어 스펙</strong>:<br>
+    - <strong>연료/산화제</strong>: 케로신(Jet-A1) 및 액체산소(LOX) 추진 매핑<br>
+    - <strong>가스발생기 사이클</strong>: 고압 터보펌프 동력구동 연소방식<br>
+    - <strong>클러스터링</strong>: 1단부 75톤급 4기 정밀 연동 (총 300톤 추력 제어)<br>
+    - <strong>Gimbaling</strong>: 유압식 피치/요 짐벌 서보 액추에이터 제어를 통해 비행 궤적 각도를 실시간 정밀 트래킹합니다.`;
+  }
+  if (q.includes('아리랑') || q.includes('위성')) {
+    return `🛰️ <strong>다목적실용위성(아리랑) 관제 스펙</strong>:<br>
+    - <strong>임무</strong>: 700km 서브미터급(초고해상도) 광학 관측 및 지구관측 합성개구레이더(SAR) 임무 수행<br>
+    - <strong>탑재체(EOS)</strong>: 반사경 렌즈 및 고감도 CCD 센서 정밀 결합<br>
+    - <strong>전력 제어</strong>: 태양 입사각 트래킹 구동계를 통해 실시간 태양전지판 전개각을 모션 보정합니다.`;
+  }
+  if (q.includes('로드맵') || q.includes('차세대')) {
+    return `🔬 <strong>KARI 우주 개발 차세대 로드맵</strong>:<br>
+    - <strong>1단계</strong>: 누리호 반복 발사를 통한 기술 신뢰성 검증<br>
+    - <strong>2단계</strong>: 100톤급 다단연소사이클 다목적 액체엔진 장착 차세대 발사체 개발 착수<br>
+    - <strong>3단계</strong>: 달 착륙선 독자 수송 능력 확보 및 유무선 심우주 탐사국가로의 도약.`;
+  }
+  if (q.includes('안녕') || q.includes('반갑')) {
+    return `반갑습니다! 관제실 AI 비서입니다. KARI 누리호 발사체나 아리랑 위성에 대해 물어보시면 상세히 안내해 드립니다. 무엇이 궁금하신가요?`;
+  }
+  
+  return `🤖 <strong>관제실 AI 비서 시스템 분석 결과</strong>:<br>
+  - 문의하신 "${escapeHtml(query)}" 관련 데이터베이스를 스캔 중입니다.<br>
+  - 한국항공우주연구원(KARI)은 독자적인 우주 수송 시스템 및 국가 저궤도 위성망 자립화에 매진하고 있습니다.<br>
+  - 발사체 75톤 엔진 작동 구조, 위성 탑재체(EOS) 구성도, 차세대 달탐사 계획에 관해 질문해 주시면 실시간 리포트를 출력해 드릴 수 있습니다.`;
+}
 
 /**
- * 브라우저 Speech Synthesis API를 이용해 이야기를 음성으로 재생
+ * ==========================================================================
+ * KARI ACCESSIBILITY (A11Y) & SITE SITEMAP OVERLAY CONTROLLER
+ * ==========================================================================
  */
+
+// A11y 설정 메뉴 토글
+window.toggleA11yMenu = function() {
+  const modal = document.getElementById('a11ySettingsModal');
+  if (modal) {
+    modal.classList.toggle('active');
+  }
+};
+
+// 폰트 크기 변경
+window.setA11yFontSize = function(size) {
+  const body = document.body;
+  const btnNormal = document.getElementById('a11yTextNormal');
+  const btnLarge = document.getElementById('a11yTextLarge');
+
+  if (size === 'large') {
+    body.classList.add('a11y-text-large');
+    if (btnLarge) btnLarge.classList.add('active');
+    if (btnNormal) btnNormal.classList.remove('active');
+  } else {
+    body.classList.remove('a11y-text-large');
+    if (btnNormal) btnNormal.classList.add('active');
+    if (btnLarge) btnLarge.classList.remove('active');
+  }
+};
+
+// 고대비 토글
+window.toggleA11yHighContrast = function() {
+  const body = document.body;
+  const btn = document.getElementById('a11yContrastBtn');
+  if (!btn) return;
+
+  const isHC = body.classList.toggle('a11y-high-contrast');
+  if (isHC) {
+    btn.textContent = "고대비 ON";
+    btn.classList.add('active');
+  } else {
+    btn.textContent = "고대비 OFF";
+    btn.classList.remove('active');
+  }
+};
+
+// 스크린 리더 음성 상태 토글
+let isA11yVoiceActive = false;
+window.toggleA11yVoiceHelp = function() {
+  const btn = document.getElementById('a11yVoiceBtn');
+  if (!btn) return;
+
+  isA11yVoiceActive = !isA11yVoiceActive;
+  if (isA11yVoiceActive) {
+    btn.textContent = "해설 켜짐 🔊";
+    btn.classList.add('active');
+    const liveStatus = document.getElementById('srLiveStatus');
+    if (liveStatus) {
+      liveStatus.innerText = "정보 접근성 음성 해설 시스템이 작동하기 시작했습니다.";
+    }
+  } else {
+    btn.textContent = "해설 끄기 🔇";
+    btn.classList.remove('active');
+  }
+};
+
+// 전체 사이트맵 모달 토글
+window.toggleSitemapModal = function() {
+  const modal = document.getElementById('sitemapModal');
+  if (modal) {
+    const isActive = modal.classList.toggle('active');
+    if (isActive) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+};
+
+// DOM 로드 즉시 햄버거 메뉴 닫기 및 열기 이벤트 링킹
+document.addEventListener('DOMContentLoaded', () => {
+  const sitemapTrigger = document.querySelector('.hamburger');
+  if (sitemapTrigger) {
+    sitemapTrigger.addEventListener('click', window.toggleSitemapModal);
+  }
+});
+
+/**
+ * ==========================================================================
+ * KIDS MODE ACCESSIBILITY BUTTON CONTROLLERS
+ * ==========================================================================
+ */
+
+// 1. 움직임 멈추기 / 재개 토글
+let kidsMotionStopped = false;
+window.toggleKidsMotion = function() {
+  const btn = document.getElementById('kidsMotionBtn');
+  kidsMotionStopped = !kidsMotionStopped;
+
+  if (kidsMotionStopped) {
+    // CSS animation-play-state: paused 적용
+    document.querySelectorAll(
+      '.cartoon-rocket-art, #kidsRocket, .rocket-flame-burst, .launch-smoke, ' +
+      '.orbit-planet, .kids-star, .float-ufo, .shooting-star, [class*="animate"]'
+    ).forEach(el => {
+      el.style.animationPlayState = 'paused';
+    });
+    if (btn) {
+      btn.textContent = '움직임 재개 ▶️';
+      btn.style.borderColor = '#ef4444';
+      btn.style.color = '#ef4444';
+    }
+  } else {
+    document.querySelectorAll(
+      '.cartoon-rocket-art, #kidsRocket, .rocket-flame-burst, .launch-smoke, ' +
+      '.orbit-planet, .kids-star, .float-ufo, .shooting-star, [class*="animate"]'
+    ).forEach(el => {
+      el.style.animationPlayState = 'running';
+    });
+    if (btn) {
+      btn.textContent = '움직임 멈추기 ⏸️';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }
+  }
+};
+
+// 2. 글자 크게 보기 토글
+let kidsFontLarge = false;
+window.toggleKidsFontSize = function() {
+  const btn = document.getElementById('kidsFontSizeBtn');
+  kidsFontLarge = !kidsFontLarge;
+
+  const kidsView = document.getElementById('view-kids');
+  if (!kidsView) return;
+
+  if (kidsFontLarge) {
+    kidsView.style.fontSize = '1.2em';
+    if (btn) {
+      btn.textContent = '글자 보통 크기 🔍';
+      btn.style.borderColor = '#0284c7';
+      btn.style.color = '#0284c7';
+    }
+  } else {
+    kidsView.style.fontSize = '';
+    if (btn) {
+      btn.textContent = '글자 크게 보기 🔍';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }
+  }
+};
+
+// 3. TTS(Text-to-Speech) 소리로 듣기
+let kidsTTSUtterance = null;
 window.playKidsTTS = function(targetId) {
   const el = document.getElementById(targetId);
   if (!el) return;
 
-  // Web Speech 지원 검사
-  if (!('speechSynthesis' in window)) {
-    alert("이 브라우저는 소리 읽어주기 기능을 지원하지 않아요. 크롬이나 에지 브라우저를 이용해 주세요! 😢");
-    return;
-  }
-
-  // 재생 중인 음성이 있으면 중지
-  window.speechSynthesis.cancel();
-
   const text = el.innerText || el.textContent;
-  kidsUtterance = new SpeechSynthesisUtterance(text);
-  
-  // 어린이용 다정한 말투 지원을 위해 한국어 가이드 설정
-  kidsUtterance.lang = 'ko-KR';
-  kidsUtterance.rate = 0.95; // 어린이용으로 살짝 느릿하고 친근하게 조정
-  kidsUtterance.pitch = 1.2; // 톤을 조금 높여 어린이 귀에 쏙 들어오게 설정
+  if (!text) return;
 
-  // 재생 시작
-  window.speechSynthesis.speak(kidsUtterance);
-};
-
-/**
- * 키즈 모드 움직임(회전, 바운싱 등) 멈춤 제어
- */
-window.toggleKidsMotion = function() {
-  const body = document.body;
-  const btn = document.getElementById('kidsMotionBtn');
-  if (!body || !btn) return;
-
-  const isPaused = body.classList.toggle('stop-motion');
-  if (isPaused) {
-    btn.textContent = "움직임 켜기 ▶️";
-    btn.classList.add('active');
-  } else {
-    btn.textContent = "움직임 멈추기 ⏸️";
-    btn.classList.remove('active');
+  // 이미 말하는 중이면 중지
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
   }
+
+  kidsTTSUtterance = new SpeechSynthesisUtterance(text);
+  kidsTTSUtterance.lang = 'ko-KR';
+  kidsTTSUtterance.rate = 0.9;   // 어린이 친화적 약간 느린 속도
+  kidsTTSUtterance.pitch = 1.1;  // 약간 높은 음색
+
+  // 한국어 음성 선택 (있을 경우)
+  const voices = window.speechSynthesis.getVoices();
+  const koVoice = voices.find(v => v.lang.startsWith('ko'));
+  if (koVoice) kidsTTSUtterance.voice = koVoice;
+
+  window.speechSynthesis.speak(kidsTTSUtterance);
 };
 
-/**
- * 키즈 모드 글자 크기 크게 보기 제어
- */
-window.toggleKidsFontSize = function() {
-  const body = document.body;
-  const btn = document.getElementById('kidsFontSizeBtn');
-  if (!body || !btn) return;
-
-  const isLarge = body.classList.toggle('large-font');
-  if (isLarge) {
-    btn.textContent = "글자 원래대로 🔍";
-    btn.classList.add('active');
-  } else {
-    btn.textContent = "글자 크게 보기 🔍";
-    btn.classList.remove('active');
-  }
-};
+// 음성 목록 로드 후 재시도 보장 (일부 브라우저는 비동기 로드)
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    // voices 업데이트 시 준비 완료 상태 갱신
+    window.speechSynthesis.getVoices();
+  };
+}
