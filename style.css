@@ -4770,3 +4770,391 @@ body.kids-mode .quick-question-chip:hover {
     opacity: 1;
   }
 }
+
+/* ==========================================================================
+   Hero Telemetry HUD & Mission Sequence Mini-Timeline Styles
+   ========================================================================== */
+.hero-telemetry-hud {
+  display: flex;
+  gap: 24px;
+  margin-top: 30px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  padding: 14px 24px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  width: fit-content;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(0, 242, 254, 0.05);
+}
+
+.tel-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tel-item .t-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(0, 242, 254, 0.7);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.tel-item .t-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+}
+
+/* 수치 변경 시 발광 트랜지션 클래스 */
+.tel-item .t-val.updating {
+  color: #00f2fe !important;
+  text-shadow: 0 0 15px rgba(0, 242, 254, 0.9) !important;
+}
+
+/* Right Mission Sequence Chapter Indicator */
+.mission-sequence-nav {
+  position: fixed;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 999;
+  pointer-events: auto;
+}
+
+.seq-dot-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.seq-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 242, 254, 0.5);
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.1);
+}
+
+.seq-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 1px;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.seq-dot-item:hover .seq-dot {
+  border-color: #00f2fe;
+  background: rgba(0, 242, 254, 0.2);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.6);
+  transform: scale(1.2);
+}
+
+.seq-dot-item:hover .seq-label {
+  opacity: 1;
+  transform: translateX(0);
+  color: #00f2fe;
+}
+
+/* 현재 액티브 스테이지 도트 스타일 */
+.seq-dot-item.active .seq-dot {
+  border-color: #00f2fe;
+  background: #00f2fe;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.8);
+  transform: scale(1.3);
+}
+
+.seq-dot-item.active .seq-label {
+  opacity: 1;
+  transform: translateX(0);
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================================================
+   Web Accessibility (A11y) & Screen Reader Support
+   ========================================================================== */
+
+/* Screen Reader Only (WCAG standard hidden text) */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* focus-visible 스타일 강화 */
+:focus-visible {
+  outline: 3px solid #00f2fe !important;
+  outline-offset: 3px !important;
+}
+
+/* Accessibility Tools GNB Button */
+.a11y-tool-btn {
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid rgba(0, 242, 254, 0.5);
+  color: #00f2fe;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.a11y-tool-btn:hover {
+  background: rgba(0, 242, 254, 0.35);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+}
+
+/* Screen Reader Alternative Text Trigger Buttons */
+.sr-desc-trigger {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.sr-desc-trigger:hover, .sr-desc-trigger:focus {
+  background: #00f2fe;
+  border-color: #00f2fe;
+  color: #03050c;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+}
+
+/* Accessibility Tools Dialog Overlay (동적 생성용) */
+.a11y-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 5, 12, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 200000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.a11y-dialog-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.a11y-dialog-box {
+  width: 480px;
+  max-width: 90%;
+  background: #0b1122;
+  border: 2px solid #00f2fe;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  font-family: 'Pretendard', sans-serif;
+  color: #ffffff;
+  text-align: left;
+}
+
+.a11y-dialog-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #00f2fe;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.a11y-dialog-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  margin-bottom: 24px;
+}
+
+.a11y-close-btn {
+  background: #00f2fe;
+  border: none;
+  color: #03050c;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.a11y-close-btn:hover {
+  background: #00cec9;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+}
+
+/* Reduced Motion preferences ( WCAG 기준 충족 ) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+  .ai-bot-avatar, .fixed-left-ai-bot, .warp-rocket-wrapper {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   Kids Mode Specific Web Accessibility (A11y)
+   ========================================================================== */
+
+/* Kids A11y Toolbar */
+.kids-a11y-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-right: 15px;
+  align-items: center;
+}
+
+.kids-a11y-btn {
+  background: #ffedd5;
+  border: 2px solid #f97316;
+  color: #c2410c;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  min-height: 48px; /* Kids minimum tap target 48px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kids-a11y-btn:hover {
+  background: #ffebd5;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(249, 115, 22, 0.2);
+}
+
+.kids-a11y-btn.active {
+  background: #f97316 !important;
+  color: #ffffff !important;
+  border-color: #ea580c !important;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* Kids TTS Speech Button */
+.kids-tts-btn {
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+  color: #15803d;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  min-height: 48px; /* minimum tap target */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.kids-tts-btn:hover {
+  background: #dcfce7;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.25);
+}
+
+/* Kids Mode body overrides */
+body.kids-mode button, 
+body.kids-mode a {
+  min-width: 48px;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+body.kids-mode :focus-visible {
+  outline: 4px dashed #f59e0b !important;
+  outline-offset: 4px !important;
+}
+
+/* 파스텔 톤 가독성 보강 (명도 대비 강화) */
+body.kids-mode p {
+  color: #0f172a !important; /* 선명한 흑청색 */
+  font-weight: 600 !important;
+}
+
+body.kids-mode h2,
+body.kids-mode h3,
+body.kids-mode h4 {
+  color: #1e293b !important;
+}
+
+/* 글자 크기 일괄 확대 */
+body.kids-mode.large-font h2 {
+  font-size: 2.3rem !important;
+}
+body.kids-mode.large-font h3 {
+  font-size: 1.8rem !important;
+}
+body.kids-mode.large-font h4 {
+  font-size: 1.4rem !important;
+}
+body.kids-mode.large-font p {
+  font-size: 1.15rem !important;
+  line-height: 1.7 !important;
+}
+body.kids-mode.large-font button,
+body.kids-mode.large-font a {
+  font-size: 1.1rem !important;
+}
+
+/* 움직임 일시 정지 */
+body.kids-mode.stop-motion *,
+body.kids-mode.stop-motion *:before,
+body.kids-mode.stop-motion *:after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}

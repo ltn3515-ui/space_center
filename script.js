@@ -282,16 +282,76 @@ function updateChatbotTheme(theme) {
     if (dialogueText) dialogueText.innerText = "무엇을 도와드릴까요?";
     if (actionBtn) actionBtn.innerText = "관제 AI와 대화하기 💬";
     
-    // 3. 추천 퀵 칩 일반화
+    // 3. 추천 퀵 칩 일반화 (우주항공 전문 질문 칩 3종 탑재)
     if (chipsContainer) {
       chipsContainer.innerHTML = `
-        <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 누리호 발사 제원')">🚀 누리호 발사 제원</button>
-        <button class="quick-question-chip" onclick="sendQuickQuestion('🛰️ 위성 분해 쇼룸 안내')">🛰️ 위성 분해 쇼룸 안내</button>
-        <button class="quick-question-chip" onclick="sendQuickQuestion('🔬 연구개발 분야')">🔬 연구개발 분야</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 누리호 75톤 엔진 구조')">🚀 누리호 75톤 엔진 구조</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🛰️ 아리랑 위성 광학 제원')">🛰️ 아리랑 위성 광학 제원</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🔬 KARI 차세대 발사체 로드맵')">🔬 KARI 차세대 발사체 로드맵</button>
       `;
     }
   }
 }
+
+/**
+ * 텔레메트리 수치 업데이트 및 은은한 사이언 발광 트랜지션
+ */
+function updateTelemetryVal(el, newValue) {
+  if (!el) return;
+  if (el.textContent !== newValue) {
+    el.textContent = newValue;
+    el.classList.add('updating');
+    if (el.updateTimeout) clearTimeout(el.updateTimeout);
+    el.updateTimeout = setTimeout(() => {
+      el.classList.remove('updating');
+    }, 150);
+  }
+}
+
+/**
+ * 우측 챕터 인디케이터 도트 활성화 싱크
+ */
+function updateMissionTimelineDots(progress) {
+  const items = document.querySelectorAll('#missionSequenceNav .seq-dot-item');
+  if (!items.length) return;
+  
+  items.forEach(item => item.classList.remove('active'));
+
+  if (progress < 0.3) {
+    items[0].classList.add('active');
+  } else if (progress >= 0.3 && progress < 0.7) {
+    items[1].classList.add('active');
+  } else {
+    items[2].classList.add('active');
+  }
+}
+
+/**
+ * 세로형 미션 챕터 인디케이터 클릭 시 해당 프레임 구간으로 스크롤 이동
+ */
+window.scrollToMissionStage = function(ratio) {
+  if (typeof ScrollTrigger === 'undefined') return;
+  const trigger = ScrollTrigger.getById("heroScrollTrigger");
+  if (!trigger) return;
+
+  const start = trigger.start;
+  const end = trigger.end;
+  const targetScroll = start + (end - start) * ratio;
+
+  // ScrollToPlugin이 로드되어 있으면 사용, 없으면 vanilla JS scrollTo smooth 폴백
+  if (typeof gsap !== 'undefined' && gsap.plugins && gsap.plugins.scrollTo) {
+    gsap.to(window, {
+      scrollTo: targetScroll,
+      duration: 1.2,
+      ease: "power2.inOut"
+    });
+  } else {
+    window.scrollTo({
+      top: targetScroll,
+      behavior: 'smooth'
+    });
+  }
+};
 
 let installedPartsCount = 0;
 const installedPartsMap = {
@@ -1277,6 +1337,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 2. GSAP ScrollTrigger Pin & Scrub Zoom 애니메이션 (동영상 연속 재생 중 스크롤 시 화면 확대)
       const heroTl = gsap.timeline({
         scrollTrigger: {
+          id: "heroScrollTrigger",
           trigger: heroSection,
           start: 'top top',
           end: '+=150%',
@@ -1284,6 +1345,45 @@ document.addEventListener('DOMContentLoaded', () => {
           scrub: true, // 스크롤 양에 맞춰 화면 확대
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            
+            // 1. Status 갱신
+            let statusStr = "점화 대기";
+            if (progress >= 0.2 && progress < 0.5) statusStr = "1단 연소";
+            else if (progress >= 0.5 && progress < 0.8) statusStr = "MECO & 단 분리";
+            else if (progress >= 0.8) statusStr = "궤도 안착";
+            
+            const statusEl = document.getElementById('heroStatusVal');
+            updateTelemetryVal(statusEl, statusStr);
+
+            // 2. Altitude 갱신
+            const altEl = document.getElementById('heroAltVal');
+            const altVal = (progress * 700.0).toFixed(1) + " KM";
+            updateTelemetryVal(altEl, altVal);
+
+            // 3. Velocity 갱신
+            const velEl = document.getElementById('heroVelVal');
+            const velVal = (progress * 7.5).toFixed(2) + " KM/S";
+            updateTelemetryVal(velEl, velVal);
+
+            // 4. 우측 챕터 인디케이터 도트 활성화 싱크
+            updateMissionTimelineDots(progress);
+
+            // 5. 스크롤 진행률에 따라 시각 장애인 음성 대체 텍스트 전달
+            let statusText = "누리호가 발사대에서 대기하고 있습니다.";
+            if (progress >= 0.2 && progress < 0.5) {
+              statusText = "1단 엔진이 힘차게 연소하며 고도 40킬로미터로 수직 상승하고 있습니다.";
+            } else if (progress >= 0.5 && progress < 0.8) {
+              statusText = "메인 엔진 연소가 정지되고, 1단이 성공적으로 분리되었습니다. 2단 엔진 점화.";
+            } else if (progress >= 0.8) {
+              statusText = "3단 위성 보호 페어링이 완전히 열리며 차세대 실용위성을 지정된 우주 궤도에 안착시켰습니다. 발사 임무가 완수되었습니다.";
+            }
+            const srLiveStatus = document.getElementById('srLiveStatus');
+            if (srLiveStatus && srLiveStatus.textContent !== statusText) {
+              srLiveStatus.textContent = statusText;
+            }
+          }
         }
       });
 
@@ -2217,6 +2317,36 @@ function appendChatMessage(sender, messageText) {
 function getKariAIResponse(userText) {
   const text = userText.toLowerCase();
 
+  // 0-1. 누리호 75톤 엔진 구조 (전문 데이터 브리핑)
+  if (text.includes('75톤') || text.includes('엔진 구조') || text.includes('엔진실')) {
+    return `🚀 **누리호 75톤급 액체엔진 핵심 구조 브리핑**\n
+- **작동 방식**: 가스발생기 사이클 (Gas Generator Cycle)\n
+- **추진제**: 케로신(Jet A-1) 및 액체산소(LOX)\n
+- **터보펌프**: 연소실 내부로 고압의 추진제를 공급하는 엔진의 심장부로, 1분에 약 20,000회 초고속 회전\n
+- **재생냉각 구조**: 노즐 및 연소실 외벽에 차가운 케로신 연료를 흘려보내 연소실 가스 온도(약 3,300°C)를 냉각시키는 첨단 벽면 재생 구조 탑재\n\n
+*누리호 1단에는 이 75톤급 액체엔진 4기가 기하학적 클러스터링(Clustering)으로 결합하여 이륙 시 총 300톤의 추력을 발휘합니다.*`;
+  }
+
+  // 0-2. 아리랑 위성 광학 제원 (전문 데이터 브리핑)
+  if (text.includes('광학 제원') || text.includes('아리랑 위성') || text.includes('광학계')) {
+    return `🛰️ **다목적 실용위성 아리랑 7호 광학계 탑재체 제원**\n
+- **해상도**: 초고해상도 서브미터급 광학 카메라 탑재 (흑백 0.3m 이하, 컬러 1.2m 이하 정밀 지구관측)\n
+- **탑재 광학계**: 대구경 주반사경(Primary Mirror) 렌즈 및 고감도 CMOS 라인 센서\n
+- **적용 기술**: 지구 자전 및 위성 진행 속도에 의한 흔들림을 보정하는 고성능 비행 자세제어 및 실시간 고속 압축 전송 엔진\n
+- **임무 궤도**: 약 500~600km 고도의 태양동기 저궤도 회전\n\n
+*우측 RESEARCH FIELDS의 '인공위성 시스템' 카드를 터치하여 전체화면 쇼룸을 실행하시면 기체의 내부 전력/렌즈 구조를 정밀하게 분해 제어해 볼 수 있습니다.*`;
+  }
+
+  // 0-3. KARI 차세대 발사체 로드맵 (전문 데이터 브리핑)
+  if (text.includes('차세대 발사체') || text.includes('로드맵') || text.includes('dlv')) {
+    return `🔬 **KARI 차세대 발사체(DLV) 및 미래 우주 로드맵 브리핑**\n
+- **목표**: 2030년대 초반 첫 발사를 향해 도약하는 2단형 고성능 액체발사체 시스템\n
+- **엔진 구성**: 1단 100톤급 다단연소사이클 엔진 5기 클러스터링(500톤 추력), 2단 10톤급 다단연소엔진 1기\n
+- **핵심 기술**: 엔진 출력 조절(Throttling) 및 재점화 기술을 적용하여 향후 '발사체 재사용성(Reusability)'을 구현할 원천 기틀\n
+- **임무 역량**: 대형 인공위성 탑재 및 달 착륙선(약 1.8톤)을 심우주 달 전이 궤도(TLI)에 직접 도달시킬 수 있는 강력한 운송 능력\n\n
+*대한민국 항공우주연구원은 이 차세대 발사체 플랫폼을 기틀 삼아 독자적인 우주 영토 개척을 달성할 예정입니다.*`;
+  }
+
   // 1. 누리호 제원 데이터
   if (text.includes('누리호') || text.includes('제원') || text.includes('nuri')) {
     return `🚀 **KSLV-II 누리호 주요 제원 안내**\n
@@ -2302,3 +2432,192 @@ window.openKariChatModal = openKariChatModal;
 window.closeKariChatModal = closeKariChatModal;
 window.sendQuickQuestion = sendQuickQuestion;
 window.sendUserChatMessage = sendUserChatMessage;
+
+/**
+ * ==========================================================================
+ * Web Accessibility (A11y) Help & Dialogue Scripts
+ * ==========================================================================
+ */
+
+/**
+ * 접근성 도구 모달 창 표시 및 토글
+ */
+window.toggleA11yMenu = function() {
+  showA11yDialog(
+    "♿ KARI 웹 접근성 지원 센터",
+    `본 웹사이트는 시각 및 청각 장애인을 포함한 모든 사용자가 정보를 동등하게 탐색할 수 있도록 설계되었습니다.<br><br>
+    - **스크린 리더 지원**: 발사 궤적과 비행 텔레메트리가 음성 텍스트(#srLiveStatus)로 실시간 중계됩니다.<br>
+    - **키보드 내비게이션**: 마우스 없이 Tab키와 방향키(Arrow Up/Down)만으로 전체 사이트를 정밀 탐색할 수 있습니다.<br>
+    - **고대비 포커스**: 탭 이동 시 사이언색 테두리(:focus-visible)가 적용됩니다.<br>
+    - **모션 중지**: prefers-reduced-motion 설정을 켜시면 눈부신 스타버스트 워프 속도선이나 플로팅 애니메이션이 자동으로 정지됩니다.`
+  );
+};
+
+/**
+ * 대체 텍스트 문서 모달 표시
+ */
+window.readDetailedDesc = function(type) {
+  if (type === 'satellite') {
+    showA11yDialog(
+      "🛰️ 인공위성 시스템 대체 설명",
+      `**[시각 대체 텍스트 문서]**<br><br>
+      이 영역은 한국항공우주연구원이 개발하는 저궤도 정밀 지구 관측 실용위성(아리랑 시리즈) 및 정지궤도 복합위성(천리안 시리즈)을 소개하는 코너입니다.<br><br>
+      - **광학 탑재체**: 위성 상단부에는 서브미터급(0.3m급) 고밀도 관측용 대구경 반사경 카메라 렌즈계가 위치하고 있습니다.<br>
+      - **동력 제어부**: 좌우 양 날개에는 태양 에너지를 전력으로 변환하는 태양전지판 날개가 넓게 펼쳐져 있으며, 본체 중앙에는 자세 제어를 위한 추력기와 자이로스코프 시스템이 장착되어 지구 자전 속도에 맞춰 카메라 정밀도를 유지합니다.`
+    );
+  } else if (type === 'satellite-showroom') {
+    showA11yDialog(
+      "🛰️ KOMPSAT ARIRANG 분해/조립 쇼룸 대체 설명",
+      `**[정밀 분해/조립 가상 쇼룸 대체 설명]**<br><br>
+      사용자가 마우스 휠을 스크롤하여 위성의 220프레임에 달하는 실시간 해체 및 결합 시퀀스를 제어할 수 있는 가상 쇼룸 캔버스 영역입니다.<br><br>
+      - **스크롤 진행 0% ~ 30% [STAGE 1: SOLAR PANEL & BOOM]**: 태양전지판 날개 및 본체 외부 열제어 블랭킷이 바깥쪽으로 분리되며 전원 공급 보드 내부 회로가 노출됩니다.<br>
+      - **스크롤 진행 31% ~ 70% [STAGE 2: SENSOR & THRUSTER]**: 중앙 자세제어 컴퓨터 및 하단 단일 추진제 연료탱크, 추력 노즐 4기가 사방으로 확장 분해됩니다.<br>
+      - **스크롤 진행 71% ~ 100% [STAGE 3: OPTICAL LENS CAMERA]**: 위성 본체의 핵심인 초고해상도 광학 렌즈 장비와 주반사경 반사 경통이 앞쪽으로 길게 돌출 해체되며 렌즈 배치도와 감지 센서 레이아웃을 1:1 정밀 표출합니다.`
+    );
+  }
+};
+
+/**
+ * 공통 접근성 정보 알림 다이알로그 팝업 생성
+ */
+function showA11yDialog(title, contentHTML) {
+  let overlay = document.getElementById('a11yDialogModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'a11yDialogModal';
+    overlay.className = 'a11y-dialog-overlay';
+
+    const box = document.createElement('div');
+    box.className = 'a11y-dialog-box';
+
+    const titleEl = document.createElement('h4');
+    titleEl.className = 'a11y-dialog-title';
+    titleEl.id = 'a11yDialogTitle';
+
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'a11y-dialog-body';
+    bodyEl.id = 'a11yDialogBody';
+
+    const btn = document.createElement('button');
+    btn.className = 'a11y-close-btn';
+    btn.textContent = '닫기 ✕';
+    btn.addEventListener('click', () => {
+      overlay.classList.remove('show');
+      const trigger = document.querySelector('.a11y-tool-btn');
+      if (trigger) trigger.focus();
+    });
+
+    box.appendChild(titleEl);
+    box.appendChild(bodyEl);
+    box.appendChild(btn);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+  }
+
+  document.getElementById('a11yDialogTitle').innerHTML = title;
+  document.getElementById('a11yDialogBody').innerHTML = contentHTML;
+
+  overlay.classList.add('show');
+  setTimeout(() => {
+    const closeBtn = overlay.querySelector('.a11y-close-btn');
+    if (closeBtn) closeBtn.focus();
+  }, 50);
+}
+
+/**
+ * 키보드 이벤트 보강 (ArrowUp/Down, PageUp/Down 입력 시 포커스 락 예방 및 부드러운 뷰포트 스크롤 제공)
+ */
+window.addEventListener('keydown', (e) => {
+  const activeModal = document.querySelector('.sat-modal-overlay.active') || 
+                      document.querySelector('.nuriho-modal-overlay.active') || 
+                      document.querySelector('.chat-modal-overlay.active') ||
+                      document.querySelector('.a11y-dialog-overlay.show');
+  if (activeModal) return;
+
+  const scrollStep = 80;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    window.scrollBy({ top: scrollStep, behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    window.scrollBy({ top: -scrollStep, behavior: 'smooth' });
+  } else if (e.key === 'PageDown') {
+    e.preventDefault();
+    window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' });
+  } else if (e.key === 'PageUp') {
+    e.preventDefault();
+    window.scrollBy({ top: -window.innerHeight * 0.7, behavior: 'smooth' });
+  }
+});
+
+/**
+ * ==========================================================================
+ * Kids Mode Specific Accessibility (TTS & Toggle Switches)
+ * ==========================================================================
+ */
+
+let kidsUtterance = null;
+
+/**
+ * 브라우저 Speech Synthesis API를 이용해 이야기를 음성으로 재생
+ */
+window.playKidsTTS = function(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+
+  // Web Speech 지원 검사
+  if (!('speechSynthesis' in window)) {
+    alert("이 브라우저는 소리 읽어주기 기능을 지원하지 않아요. 크롬이나 에지 브라우저를 이용해 주세요! 😢");
+    return;
+  }
+
+  // 재생 중인 음성이 있으면 중지
+  window.speechSynthesis.cancel();
+
+  const text = el.innerText || el.textContent;
+  kidsUtterance = new SpeechSynthesisUtterance(text);
+  
+  // 어린이용 다정한 말투 지원을 위해 한국어 가이드 설정
+  kidsUtterance.lang = 'ko-KR';
+  kidsUtterance.rate = 0.95; // 어린이용으로 살짝 느릿하고 친근하게 조정
+  kidsUtterance.pitch = 1.2; // 톤을 조금 높여 어린이 귀에 쏙 들어오게 설정
+
+  // 재생 시작
+  window.speechSynthesis.speak(kidsUtterance);
+};
+
+/**
+ * 키즈 모드 움직임(회전, 바운싱 등) 멈춤 제어
+ */
+window.toggleKidsMotion = function() {
+  const body = document.body;
+  const btn = document.getElementById('kidsMotionBtn');
+  if (!body || !btn) return;
+
+  const isPaused = body.classList.toggle('stop-motion');
+  if (isPaused) {
+    btn.textContent = "움직임 켜기 ▶️";
+    btn.classList.add('active');
+  } else {
+    btn.textContent = "움직임 멈추기 ⏸️";
+    btn.classList.remove('active');
+  }
+};
+
+/**
+ * 키즈 모드 글자 크기 크게 보기 제어
+ */
+window.toggleKidsFontSize = function() {
+  const body = document.body;
+  const btn = document.getElementById('kidsFontSizeBtn');
+  if (!body || !btn) return;
+
+  const isLarge = body.classList.toggle('large-font');
+  if (isLarge) {
+    btn.textContent = "글자 원래대로 🔍";
+    btn.classList.add('active');
+  } else {
+    btn.textContent = "글자 크게 보기 🔍";
+    btn.classList.remove('active');
+  }
+};

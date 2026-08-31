@@ -66,6 +66,7 @@
             <span class="active">일반모드</span>
             <span onclick="switchTheme('kids')" class="clickable">키즈모드 전환 🎈</span>
           </div>
+          <button class="a11y-tool-btn" onclick="toggleA11yMenu()" aria-label="접근성 도구 및 텍스트 대체 설명 보기">접근성 ♿</button>
           <div class="hamburger">☰</div>
         </div>
       </div>
@@ -158,6 +159,7 @@
     <section class="pro-hero" id="heroScrubSection">
       <!-- 비디오 대신 캔버스 삽입 -->
       <canvas id="heroScrubCanvas" class="hero-bg-canvas"></canvas>
+      <div id="srLiveStatus" class="sr-only" aria-live="polite" aria-atomic="true">누리호 발사 대기 중입니다.</div>
       <div class="hero-bg-overlay"></div>
 
       <div class="hero-content">
@@ -168,10 +170,25 @@
           아래로 스크롤하여 75톤급 엔진 점화 및 발사 시퀀스를 직접 제어해 보세요.
         </p>
         <div class="hero-telemetry-hud">
-          <div class="tel-item"><span class="t-lbl">STATUS:</span> <span class="t-val" id="heroStatusVal">READY TO
-              LAUNCH</span></div>
-          <div class="tel-item"><span class="t-lbl">ALTITUDE:</span> <span class="t-val" id="heroAltVal">0.0 KM</span>
-          </div>
+          <div class="tel-item"><span class="t-lbl">STATUS:</span> <span class="t-val" id="heroStatusVal">READY TO LAUNCH</span></div>
+          <div class="tel-item"><span class="t-lbl">ALTITUDE:</span> <span class="t-val" id="heroAltVal">0.0 KM</span></div>
+          <div class="tel-item"><span class="t-lbl">VELOCITY:</span> <span class="t-val" id="heroVelVal">0.0 M/S</span></div>
+        </div>
+      </div>
+
+      <!-- Right Mission Sequence Chapter Indicator (Vertical Mini Timeline) -->
+      <div class="mission-sequence-nav" id="missionSequenceNav">
+        <div class="seq-dot-item" data-target="0" onclick="scrollToMissionStage(0)">
+          <span class="seq-dot"></span>
+          <span class="seq-label">STAGE 01: IGNITION</span>
+        </div>
+        <div class="seq-dot-item" data-target="0.5" onclick="scrollToMissionStage(0.5)">
+          <span class="seq-dot"></span>
+          <span class="seq-label">STAGE 02: MAX-Q</span>
+        </div>
+        <div class="seq-dot-item" data-target="1" onclick="scrollToMissionStage(1)">
+          <span class="seq-dot"></span>
+          <span class="seq-label">STAGE 03: SEPARATION</span>
         </div>
       </div>
 
@@ -291,6 +308,7 @@
             <h4>인공위성 시스템</h4>
             <p>저궤도 고해상도 지구관측 위성 및 정지궤도 복합 임무 위성 개발</p>
             <div class="corner-arrow">↗</div>
+            <button class="sr-desc-trigger" onclick="readDetailedDesc('satellite')" aria-label="인공위성 시스템 상세 텍스트 대체 설명 보기">대체 설명 보기 ♿</button>
           </div>
 
           <div class="bento-card bento-sub-card">
@@ -641,6 +659,10 @@
           </div>
         </div>
       </nav>
+      <div class="kids-a11y-toolbar">
+        <button class="kids-a11y-btn" onclick="toggleKidsMotion()" id="kidsMotionBtn" aria-label="움직임 멈춤 토글">움직임 멈추기 ⏸️</button>
+        <button class="kids-a11y-btn" onclick="toggleKidsFontSize()" id="kidsFontSizeBtn" aria-label="글자 크기 토글">글자 크게 보기 🔍</button>
+      </div>
       <button class="kids-swap-btn" onclick="switchTheme('pro')">
         일반모드로 전환 🚀
       </button>
@@ -650,7 +672,8 @@
     <section class="kids-hero">
       <div class="kids-hero-box">
         <h2 class="kids-title">우주로 떠나는 모험!</h2>
-        <p class="kids-subtitle">KARI 친구들과 함께 신나는 우주 여행을 시작해볼까요?</p>
+        <p class="kids-subtitle" id="kidsHeroDesc">KARI 친구들과 함께 신나는 우주 여행을 시작해볼까요?</p>
+        <button class="kids-tts-btn" onclick="playKidsTTS('kidsHeroDesc')" aria-label="소리로 설명 듣기">🔊 소리로 듣기</button>
 
         <div class="kids-illustration-frame" id="kidsHeroFrame">
           <!-- Launch Pad (발사대) -->
@@ -699,7 +722,8 @@
             </div>
             <span class="tag-pill tag-pink">로켓 친구</span>
             <h4>우리 친구 누리호</h4>
-            <p>누리호는 우주로 날아가는 멋진 한국의 로켓이에요!</p>
+            <p id="kids-story-desc-1">우리 친구 누리호는 우주로 날아가는 멋진 한국의 로켓이에요!</p>
+            <button class="kids-tts-btn" onclick="playKidsTTS('kids-story-desc-1')" aria-label="소리로 설명 듣기">🔊 소리로 듣기</button>
           </div>
           <div class="story-card">
             <div class="story-thumb bg-navy">
@@ -707,7 +731,8 @@
             </div>
             <span class="tag-pill tag-orange">달 탐험</span>
             <h4>달님 탐험기 다누리</h4>
-            <p>토끼가 산다는 달님은 어떻게 생겼을까요?</p>
+            <p id="kids-story-desc-2">토끼가 산다는 저 높은 하늘의 아름다운 달님은 어떻게 생겼을까요?</p>
+            <button class="kids-tts-btn" onclick="playKidsTTS('kids-story-desc-2')" aria-label="소리로 설명 듣기">🔊 소리로 듣기</button>
           </div>
           <div class="story-card">
             <div class="story-thumb bg-purple">
@@ -715,7 +740,8 @@
             </div>
             <span class="tag-pill tag-yellow">별자리</span>
             <h4>반짝반짝 별자리</h4>
-            <p>밤하늘을 수놓은 아름다운 별들의 이야기를 들어봐요.</p>
+            <p id="kids-story-desc-3">어두운 밤하늘을 예쁘게 수놓은 반짝반짝 별들의 재미있는 이야기를 들어봐요.</p>
+            <button class="kids-tts-btn" onclick="playKidsTTS('kids-story-desc-3')" aria-label="소리로 설명 듣기">🔊 소리로 듣기</button>
           </div>
         </div>
       </section>
@@ -930,6 +956,7 @@
         <!-- Sticky Video & Telemetry Display Frame -->
         <div class="sat-modal-sticky-stage">
           <canvas id="satScrubCanvas" class="sat-scrub-canvas"></canvas>
+          <button class="sr-desc-trigger sr-only" onclick="readDetailedDesc('satellite-showroom')" aria-label="인공위성 분해 조립 쇼룸 상세 텍스트 대체 설명 보기">대체 설명 보기 ♿</button>
 
           <!-- Cinematic Vignette & Neon HUD Overlays -->
           <div class="sat-hud-overlay">
@@ -1012,9 +1039,9 @@
 
       <!-- Recommended Quick Question Chips -->
       <div class="chat-chips-container" id="chatChipsContainer">
-        <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 누리호 발사 제원')">🚀 누리호 발사 제원</button>
-        <button class="quick-question-chip" onclick="sendQuickQuestion('🛰️ 위성 분해 쇼룸 안내')">🛰️ 위성 분해 쇼룸 안내</button>
-        <button class="quick-question-chip" onclick="sendQuickQuestion('🔬 연구개발 분야')">🔬 연구개발 분야</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 누리호 75톤 엔진 구조')">🚀 누리호 75톤 엔진 구조</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🛰️ 아리랑 위성 광학 제원')">🛰️ 아리랑 위성 광학 제원</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🔬 KARI 차세대 발사체 로드맵')">🔬 KARI 차세대 발사체 로드맵</button>
       </div>
 
       <!-- Chat Input Footer -->
