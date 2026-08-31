@@ -13,6 +13,7 @@
     rel="stylesheet" />
   <!-- Three.js & GSAP for 3D WebGL Satellite Navigation Simulation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
@@ -25,12 +26,14 @@
     <div class="hud-crosshair-lines"></div>
   </div>
 
-  <!-- Hyperspace Warp Transition Overlay -->
-  <div id="warpOverlay" class="warp-overlay">
-    <div class="warp-speed-lines"></div>
-    <div class="warp-rocket-wrapper">
-      <span class="warp-rocket-icon">🚀</span>
-      <div class="warp-rocket-trail"></div>
+  <!-- Hyperspace Warp & HUD Countdown Transition Overlay -->
+  <div id="modeTransitionOverlay" class="mode-transition-overlay">
+    <canvas id="warpCanvas"></canvas>
+    <div class="trans-flash-effect" id="transFlashEffect"></div>
+    <div class="trans-text-panel">
+      <div class="trans-status-sub" id="transStatusSub">SYSTEM WARP INITIATED</div>
+      <div class="trans-status-main" id="transStatusMain">🚀 신나는 KARI 키즈 행성으로 도약 중!</div>
+      <div class="trans-countdown" id="transCountdown">WARP IN 3</div>
     </div>
   </div>
 
@@ -151,21 +154,29 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="pro-hero">
-      <video class="hero-bg-video" id="heroNurihoVideo" src="img/satellite04.mp4" autoplay loop muted playsinline preload="auto"></video>
+    <!-- Hero Section (Canvas Scroll Scrubbing) -->
+    <section class="pro-hero" id="heroScrubSection">
+      <!-- 비디오 대신 캔버스 삽입 -->
+      <canvas id="heroScrubCanvas" class="hero-bg-canvas"></canvas>
       <div class="hero-bg-overlay"></div>
+
       <div class="hero-content">
         <h1 class="hero-title">LIFTOFF<br />KOREA</h1>
         <h3 class="hero-subtitle">누리호 (KSLV-II)</h3>
         <p class="hero-desc">
-          대한민국 독자 기술로 개발된 3단형 우주발사체 누리호입니다. 75톤급 액체엔진 4기를 묶는 클러스터링 기술을 통해 강력한 추진력을 확보하였으며, 민간 우주 개발 시대를 선도하는 한국 우주 수송의
-          핵심 인프라입니다.
+          대한민국 독자 기술로 개발된 3단형 우주발사체 누리호입니다.
+          아래로 스크롤하여 75톤급 엔진 점화 및 발사 시퀀스를 직접 제어해 보세요.
         </p>
-        <button class="pro-cta-btn" onclick="openNurihoSimModal()">🚀 누리호 3D 가상 발사 시뮬레이션 →</button>
+        <div class="hero-telemetry-hud">
+          <div class="tel-item"><span class="t-lbl">STATUS:</span> <span class="t-val" id="heroStatusVal">READY TO
+              LAUNCH</span></div>
+          <div class="tel-item"><span class="t-lbl">ALTITUDE:</span> <span class="t-val" id="heroAltVal">0.0 KM</span>
+          </div>
+        </div>
       </div>
+
       <div class="scroll-down-indicator">
-        <span>SCROLL DOWN TO ZOOM & EXPLORE</span>
-        <div class="arrow">↓</div>
+        <span>SCROLL DOWN TO IGNITE ↓</span>
       </div>
     </section>
 
@@ -252,7 +263,7 @@
           <div class="bento-card bento-hero">
             <div class="bento-badge-group">
               <span class="badge-cyan">75T THRUST</span>
-              <span class="badge-radar">● LIVE TELEMETRY</span>
+              <span class="badge-radar"><span class="radar-dot">●</span> LIVE TELEMETRY</span>
             </div>
             <div class="bento-hero-visual">
               <video class="bento-hero-video" src="img/satellite02.mp4" autoplay loop muted playsinline></video>
@@ -274,7 +285,7 @@
             <div class="corner-arrow">↗</div>
           </div>
 
-          <div class="bento-card bento-sub-card">
+          <div class="bento-card bento-sub-card" id="bento-satellite">
             <div class="sub-card-bg bg-satellite"></div>
             <span class="sub-label sky-text">SATELLITE</span>
             <h4>인공위성 시스템</h4>
@@ -575,6 +586,8 @@
 
   <!-- ================= [2. 키즈 카툰 모드 (KIDS VIEW)] ================= -->
   <div id="view-kids" class="page-view">
+    <!-- Kids background mouse star trail canvas -->
+    <canvas id="kidsStarTrailCanvas" class="kids-star-trail-canvas"></canvas>
 
     <!-- Kids Header -->
     <header class="kids-header">
@@ -900,6 +913,118 @@
     </footer>
   </div>
 
+  <!-- ================= [SATELLITE EXPLODED VIEW MODAL] ================= -->
+  <div id="satelliteModal" class="sat-modal-overlay">
+    <div class="sat-modal-container">
+      <!-- HUD Header Bar -->
+      <div class="sat-modal-header">
+        <div class="sat-modal-badge">
+          <span class="sat-status-dot"></span>
+          <span class="sat-title-text">KOMPSAT ARIRANG // EXPLODED VIEW</span>
+        </div>
+        <button class="sat-modal-close" onclick="closeSatelliteModal()" title="관제 종료">✕ CLOSE</button>
+      </div>
+
+      <!-- Modal Body (Scroll Scrubbing Container) -->
+      <div class="sat-modal-body" id="satModalScrollBody">
+        <!-- Sticky Video & Telemetry Display Frame -->
+        <div class="sat-modal-sticky-stage">
+          <canvas id="satScrubCanvas" class="sat-scrub-canvas"></canvas>
+
+          <!-- Cinematic Vignette & Neon HUD Overlays -->
+          <div class="sat-hud-overlay">
+            <!-- HUD Corner Brackets -->
+            <div class="sat-corner-bracket sat-top-left"></div>
+            <div class="sat-corner-bracket sat-top-right"></div>
+            <div class="sat-corner-bracket sat-bottom-left"></div>
+            <div class="sat-corner-bracket sat-bottom-right"></div>
+
+            <!-- Telemetry Gauges -->
+            <div class="sat-telemetry-box sat-telemetry-left">
+              <div class="sat-tel-row"><span class="sat-lbl">OBJECT:</span> <span class="sat-val cyan">KOMPSAT-7 / ARIRANG</span></div>
+              <div class="sat-tel-row"><span class="sat-lbl">STAGE STATUS:</span> <span class="sat-val" id="satStageText">[STAGE 1] 전력 공급계 - 태양전지판 전개 분해</span></div>
+            </div>
+
+            <div class="sat-telemetry-box sat-telemetry-right">
+              <div class="sat-tel-row"><span class="sat-lbl">DISSOLUTION PROGRESS:</span> <span class="sat-val sky" id="satProgressText">0%</span></div>
+              <div class="sat-tel-row"><span class="sat-lbl">STATUS:</span> <span class="sat-val green" id="satStatusVal">READY FOR EXPLOSION</span></div>
+            </div>
+
+            <!-- Scroll Guidance Tip -->
+            <div class="sat-modal-scroll-tip">
+              <span class="sat-mouse-icon">🖱️</span>
+              <span>마우스 휠을 스크롤하여 위성의 분해 및 조립 과정을 제어하세요</span>
+            </div>
+
+            <!-- Bottom Progress Track -->
+            <div class="sat-scrub-bar-wrapper">
+              <div class="sat-scrub-time-info">
+                <span>STAGE CONTROL // 1:1 SCROLL DETECTOR</span>
+              </div>
+              <div class="sat-scrub-progress-track">
+                <div class="sat-scrub-progress-fill" id="satScrubProgressFill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden Scroll Spacer for Scroll Scrubbing (3000px height) -->
+        <div class="sat-modal-scroll-spacer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= [KARI AI ASSISTANT FIXED WIDGET] ================= -->
+  <div class="fixed-left-ai-bot" id="fixedLeftAiBot">
+    <div class="ai-bot-avatar" id="aiBotTrigger" onclick="openKariChatModal()">
+      <img src="img/robot.jpg" data-default="img/robot.jpg" data-kids="img/robot02.jpg" alt="AI Assistant" class="bot-avatar-img" id="botAvatarImg" />
+    </div>
+    <div class="ai-dialogue-bubble">
+      <div class="ai-bubble-text" id="botDialogueText">무엇을 도와드릴까요?</div>
+      <button class="ai-bubble-btn" id="botActionBtn" onclick="openKariChatModal()">관제 AI와 대화하기 💬</button>
+    </div>
+  </div>
+
+  <!-- ================= [KARI AI FLIGHT ASSISTANT CHATBOT MODAL] ================= -->
+  <div id="kariChatModal" class="chat-modal-overlay">
+    <div class="chat-modal-container">
+      <!-- Chat Header -->
+      <div class="chat-modal-header">
+        <div class="chat-status-indicator">
+          <span class="chat-live-dot"></span>
+          <span class="chat-title">KARI FLIGHT ASSISTANT // 관제 챗봇</span>
+        </div>
+        <button class="chat-modal-close-btn" onclick="closeKariChatModal()">✕</button>
+      </div>
+
+      <!-- Chat Messages Body -->
+      <div class="chat-messages-body" id="chatMessagesList">
+        <!-- Initial AI greeting message -->
+        <div class="chat-message ai-message">
+          <div class="msg-bubble">
+            안녕하세요, KARI 비행 관제실에 오신 것을 환영합니다! 🚀<br>
+            저는 대한민국 우주 연구 및 발사체/위성에 대한 관제 도우미 AI입니다.<br>
+            궁금한 사항이 있으시면 아래 추천 퀵 질문을 클릭하시거나 직접 질문해 주세요!
+          </div>
+          <span class="msg-timestamp">SYSTEM ACTIVE</span>
+        </div>
+      </div>
+
+      <!-- Recommended Quick Question Chips -->
+      <div class="chat-chips-container" id="chatChipsContainer">
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 누리호 발사 제원')">🚀 누리호 발사 제원</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🛰️ 위성 분해 쇼룸 안내')">🛰️ 위성 분해 쇼룸 안내</button>
+        <button class="quick-question-chip" onclick="sendQuickQuestion('🔬 연구개발 분야')">🔬 연구개발 분야</button>
+      </div>
+
+      <!-- Chat Input Footer -->
+      <div class="chat-input-footer">
+        <input type="text" id="chatInputText" placeholder="질문 내용을 입력하세요... (예: KARI가 무엇인가요?)" onkeydown="if(event.key === 'Enter') sendUserChatMessage()">
+        <button class="chat-send-btn" onclick="sendUserChatMessage()">전송 ⌲</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= [NURIHO LAUNCH SIMULATION MODAL] ================= -->
   <div id="nurihoSimModal" class="nuriho-modal-overlay">
     <div class="nuriho-modal-container">
@@ -916,7 +1041,8 @@
       <div class="nuriho-modal-body" id="nurihoModalScrollBody">
         <!-- Sticky Video & Telemetry Display Frame -->
         <div class="nuriho-modal-sticky-stage">
-          <video id="modalNurihoVideo" class="modal-nuriho-video" src="img/nuri.mp4" muted playsinline preload="auto"></video>
+          <video id="modalNurihoVideo" class="modal-nuriho-video" src="img/nuri.mp4" muted playsinline
+            preload="auto"></video>
 
           <!-- Cinematic Vignette & Neon HUD Overlays -->
           <div class="modal-hud-overlay">
@@ -928,13 +1054,17 @@
 
             <!-- Telemetry Gauges -->
             <div class="telemetry-box telemetry-top-left">
-              <div class="tel-row"><span class="lbl">MISSION:</span> <span class="val cyan">KSLV-II / LAUNCH #3</span></div>
-              <div class="tel-row"><span class="lbl">STAGE:</span> <span class="val" id="nurihoStageVal">1단 클러스터링 점화</span></div>
+              <div class="tel-row"><span class="lbl">MISSION:</span> <span class="val cyan">KSLV-II / LAUNCH #3</span>
+              </div>
+              <div class="tel-row"><span class="lbl">STAGE:</span> <span class="val" id="nurihoStageVal">1단 클러스터링
+                  점화</span></div>
             </div>
 
             <div class="telemetry-box telemetry-top-right">
-              <div class="tel-row"><span class="lbl">ALTITUDE:</span> <span class="val sky" id="nurihoAltVal">0.0 KM</span></div>
-              <div class="tel-row"><span class="lbl">VELOCITY:</span> <span class="val green" id="nurihoVelVal">0.00 KM/S</span></div>
+              <div class="tel-row"><span class="lbl">ALTITUDE:</span> <span class="val sky" id="nurihoAltVal">0.0
+                  KM</span></div>
+              <div class="tel-row"><span class="lbl">VELOCITY:</span> <span class="val green" id="nurihoVelVal">0.00
+                  KM/S</span></div>
             </div>
 
             <!-- Scroll Guidance Tip -->
@@ -966,5 +1096,19 @@
 
   <script src="script.js"></script>
 </body>
+<!-- Intro Number Ticker Preloader Screen -->
+<div id="introPreloader" class="intro-preloader">
+  <div class="intro-bg-grid"></div>
+  <div class="intro-content">
+    <div class="intro-tag">KARI MISSION CONTROL SYSTEM INITIALIZING</div>
+    <div class="intro-ticker-wrap">
+      <span id="numberTicker" class="ticker-number">0</span><span class="ticker-unit">%</span>
+    </div>
+    <div class="intro-progress-bar">
+      <div id="introProgressFill" class="progress-fill"></div>
+    </div>
+    <div class="intro-status-text" id="introStatusText">CALIBRATING ORBITAL TELEMETRY...</div>
+  </div>
+</div>
 
 </html>
