@@ -6233,4 +6233,100 @@ body.a11y-high-contrast a,
 body.a11y-high-contrast button {
   color: #ffff00 !important;
   border-color: #ffff00 !important;
+}
+
+/* ==========================================================================
+   Kids Alert Modal Overlay (부품 조립 순서 오류 안내 모달)
+   ========================================================================== */
+.kids-alert-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000000;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.kids-alert-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.kids-alert-modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 4px solid #f59e0b;
+  border-radius: 28px;
+  padding: 32px 28px;
+  box-shadow: 0 20px 50px rgba(245, 158, 11, 0.35);
+  text-align: center;
+  transform: scale(0.85) translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.35);
+}
+
+.kids-alert-modal-overlay.active .kids-alert-modal-card {
+  transform: scale(1) translateY(0);
+}
+
+.kids-alert-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: kidsBounceAlert 0.8s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes kidsBounceAlert {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-8px) scale(1.1); }
+}
+
+.kids-alert-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #d97706;
+  margin-bottom: 14px;
+}
+
+.kids-alert-body {
+  font-size: 15px;
+  font-weight: 700;
+  color: #334155;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  background: #fef3c7;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1.5px solid #fde047;
+}
+
+.kids-alert-confirm-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 900;
+  padding: 14px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kids-alert-confirm-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+.kids-alert-confirm-btn:active {
+  transform: scale(0.96);
 }

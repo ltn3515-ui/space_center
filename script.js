@@ -358,6 +358,66 @@ window.scrollToMissionStage = function (ratio) {
 let installedPartsCount = 0;
 const installedPartsMap = { booster: false, tank: false, payload: false, fairing: false };
 
+// 키즈 모드 조립 오류 및 실시간 안내 커스텀 모달
+window.showKidsAlertModal = function(title, messageHTML) {
+  let modalOverlay = document.getElementById('kidsAlertModalOverlay');
+  
+  if (!modalOverlay) {
+    modalOverlay = document.createElement('div');
+    modalOverlay.id = 'kidsAlertModalOverlay';
+    modalOverlay.className = 'kids-alert-modal-overlay';
+    modalOverlay.innerHTML = `
+      <div class="kids-alert-modal-card">
+        <div class="kids-alert-icon">💡</div>
+        <h3 id="kidsAlertTitle" class="kids-alert-title"></h3>
+        <div id="kidsAlertBody" class="kids-alert-body"></div>
+        <button type="button" class="kids-alert-confirm-btn" onclick="closeKidsAlertModal()">확인 / 다시 조립하기 🚀</button>
+      </div>
+    `;
+    document.body.appendChild(modalOverlay);
+  }
+
+  const titleEl = document.getElementById('kidsAlertTitle');
+  const bodyEl = document.getElementById('kidsAlertBody');
+
+  if (titleEl) titleEl.innerHTML = title;
+  if (bodyEl) bodyEl.innerHTML = messageHTML;
+
+  // TTS 음성 안내 (어린이 가독성 및 접근성 보장)
+  if ('speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+      const cleanText = messageHTML.replace(/<[^>]*>/g, ' ');
+      const alertAudio = new SpeechSynthesisUtterance(`${title}. ${cleanText}`);
+      alertAudio.lang = 'ko-KR';
+      alertAudio.rate = 1.0;
+      alertAudio.pitch = 1.1;
+
+      const voices = window.speechSynthesis.getVoices();
+      const koVoice = voices.find(v => v.lang.startsWith('ko'));
+      if (koVoice) alertAudio.voice = koVoice;
+
+      window.speechSynthesis.speak(alertAudio);
+    } catch(e) {
+      console.warn("Alert TTS speech error:", e);
+    }
+  }
+
+  requestAnimationFrame(() => {
+    modalOverlay.classList.add('active');
+  });
+};
+
+window.closeKidsAlertModal = function() {
+  const modalOverlay = document.getElementById('kidsAlertModalOverlay');
+  if (modalOverlay) {
+    modalOverlay.classList.remove('active');
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+};
+
 function addRocketPart(partType, btnEl) {
   if (installedPartsMap[partType]) return;
 
@@ -521,7 +581,10 @@ function launchAssembledRocketUpward() {
 
 function finishRocketAssembly() {
   if (installedPartsCount < 4) {
-    alert(`아직 로켓 부품이 남았어요! (${installedPartsCount}/4)\n4개 부품을 모두 결합해 주세요! 🚀`);
+    showKidsAlertModal(
+      "조립 미완료! 🚀",
+      `아직 결합되지 않은 로켓 부품이 남아있어요! (${installedPartsCount}/4)<br><br><b>부스터 ➔ 연료 탱크 ➔ 페이로드 ➔ 페어링</b> 순서대로 4개 부품을 모두 완성해 주세요!`
+    );
     return;
   }
   launchAssembledRocketUpward();
