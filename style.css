@@ -319,8 +319,6 @@ body.theme-default {
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
-  transform: scale(1.06);
-  transform-origin: center center;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   filter: contrast(1.15) brightness(1.05) saturate(1.05);
@@ -3769,8 +3767,6 @@ body.theme-kids {
   height: 100vh;
   object-fit: cover;
   z-index: 1;
-  transform: scale(1.06);
-  transform-origin: center center;
   filter: contrast(1.12) brightness(1.03) saturate(1.08);
   /* 화염과 동체의 대비/선명도 강화 */
 }
@@ -6340,4 +6336,101 @@ body.a11y-high-contrast button {
 
 .kids-alert-confirm-btn:active {
   transform: scale(0.96);
+}
+
+/* ==========================================================================
+   Hero Compass HUD Widget (Orientation Watermark Cover)
+   ========================================================================== */
+.hero-compass-hud,
+#heroCompassHud {
+  position: absolute;
+  right: 30px;
+  bottom: 30px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(8, 14, 28, 0.88);
+  border: 1.5px solid rgba(0, 242, 254, 0.4);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 242, 254, 0.15);
+  width: 190px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.compass-circle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px dashed #00f2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ringRotate 20s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes ringRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.compass-ring {
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: 50%;
+}
+
+.compass-crosshair {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #00f2fe;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00f2fe;
+}
+
+.compass-axis.n {
+  position: absolute;
+  top: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #00f2fe;
+}
+
+.compass-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.compass-info .hud-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #64748b;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.compass-info .hud-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+
+.compass-info .hud-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #10b981;
+  font-weight: 700;
 }

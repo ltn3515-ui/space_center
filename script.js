@@ -838,18 +838,11 @@ function initHeroCanvasScrubber() {
     drawX = (logicalWidth - drawW) / 2;
     drawY = (logicalHeight - drawH) / 2;
 
-    // 1.06배(6%) 오버스캔 확대 및 중심축 기준 중앙 정렬 (-x, -y 오프셋 계산으로 하단 워터마크 크롭)
-    const scaleFactor = 1.06;
-    const scaledW = drawW * scaleFactor;
-    const scaledH = drawH * scaleFactor;
-    const scaledX = drawX - (scaledW - drawW) / 2;
-    const scaledY = drawY - (scaledH - drawH) / 2;
-
     ctx.save();
     ctx.scale(dpr, dpr);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, scaledX, scaledY, scaledW, scaledH);
+    ctx.drawImage(img, drawX, drawY, drawW, drawH);
     ctx.restore();
   }
 
@@ -911,6 +904,13 @@ function initHeroCanvasScrubber() {
           if (altEl) altEl.innerText = (progress * 700.0).toFixed(1) + " KM";
           const velEl = document.getElementById('heroVelVal');
           if (velEl) velEl.innerText = (progress * 7.5).toFixed(2) + " KM/S";
+
+          // 관제실 컴퍼스 HUD Pitch 각도 실시간 동적 연동 (+0.0° -> +85.0°)
+          const compassPitchVal = document.getElementById('compassPitchVal');
+          if (compassPitchVal) {
+            const pitchDeg = (progress * 85.0).toFixed(1);
+            compassPitchVal.innerText = `PITCH: +${pitchDeg}°`;
+          }
 
           let statusStr = "READY TO LAUNCH";
           if (progress >= 0.15 && progress < 0.45) statusStr = "STAGE 1 IGNITION";
