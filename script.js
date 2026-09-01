@@ -1735,17 +1735,31 @@ window.toggleA11yMenu = function() {
 // 폰트 크기 변경
 window.setA11yFontSize = function(size) {
   const body = document.body;
+  const kidsView = document.getElementById('view-kids');
   const btnNormal = document.getElementById('a11yTextNormal');
   const btnLarge = document.getElementById('a11yTextLarge');
+  const kidsBtn = document.getElementById('kidsFontSizeBtn');
 
   if (size === 'large') {
     body.classList.add('a11y-text-large');
+    if (kidsView) kidsView.classList.add('kids-font-large');
+    kidsFontLarge = true;
     if (btnLarge) btnLarge.classList.add('active');
     if (btnNormal) btnNormal.classList.remove('active');
+    if (kidsBtn) {
+      kidsBtn.textContent = '글자 보통 크기 🔍';
+      kidsBtn.classList.add('active');
+    }
   } else {
     body.classList.remove('a11y-text-large');
+    if (kidsView) kidsView.classList.remove('kids-font-large');
+    kidsFontLarge = false;
     if (btnNormal) btnNormal.classList.add('active');
     if (btnLarge) btnLarge.classList.remove('active');
+    if (kidsBtn) {
+      kidsBtn.textContent = '글자 크게 보기 🔍';
+      kidsBtn.classList.remove('active');
+    }
   }
 };
 
@@ -1846,28 +1860,34 @@ window.toggleKidsMotion = function() {
   }
 };
 
-// 2. 글자 크게 보기 토글
+// 2. 글자 크게 보기 토글 (화면 비율 맞춤형 고해상도 글자 확대)
 let kidsFontLarge = false;
 window.toggleKidsFontSize = function() {
   const btn = document.getElementById('kidsFontSizeBtn');
   kidsFontLarge = !kidsFontLarge;
 
   const kidsView = document.getElementById('view-kids');
-  if (!kidsView) return;
+  const body = document.body;
 
   if (kidsFontLarge) {
-    kidsView.style.fontSize = '1.2em';
+    if (kidsView) kidsView.classList.add('kids-font-large');
+    body.classList.add('a11y-text-large');
     if (btn) {
       btn.textContent = '글자 보통 크기 🔍';
+      btn.classList.add('active');
       btn.style.borderColor = '#0284c7';
       btn.style.color = '#0284c7';
+      btn.style.background = '#e0f2fe';
     }
   } else {
-    kidsView.style.fontSize = '';
+    if (kidsView) kidsView.classList.remove('kids-font-large');
+    body.classList.remove('a11y-text-large');
     if (btn) {
       btn.textContent = '글자 크게 보기 🔍';
+      btn.classList.remove('active');
       btn.style.borderColor = '';
       btn.style.color = '';
+      btn.style.background = '';
     }
   }
 };
