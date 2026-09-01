@@ -1869,24 +1869,25 @@ window.toggleA11yVoiceHelp = function() {
   }
 };
 
-// 전체 사이트맵 모달 토글
+// 전체 사이트맵 모달 토글 (allMenuOverlay 연동)
 window.toggleSitemapModal = function() {
-  const modal = document.getElementById('sitemapModal');
-  if (modal) {
-    const isActive = modal.classList.toggle('active');
-    if (isActive) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+  if (typeof window.toggleAllMenuOverlay === 'function') {
+    window.toggleAllMenuOverlay();
+  } else {
+    const overlay = document.getElementById('allMenuOverlay') || document.getElementById('sitemapModal');
+    if (overlay) overlay.classList.toggle('is-open');
   }
 };
 
-// DOM 로드 즉시 햄버거 메뉴 닫기 및 열기 이벤트 링킹
+// DOM 로드 즉시 햄버거 메뉴 이벤트 링킹
 document.addEventListener('DOMContentLoaded', () => {
-  const sitemapTrigger = document.querySelector('.hamburger');
+  const sitemapTrigger = document.querySelector('.hamburger') || document.getElementById('menuToggleBtn');
   if (sitemapTrigger) {
-    sitemapTrigger.addEventListener('click', window.toggleSitemapModal);
+    sitemapTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      window.toggleAllMenuOverlay();
+    });
   }
 });
 
