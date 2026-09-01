@@ -157,8 +157,10 @@
     <!-- Hero Section -->
     <!-- Hero Section (Canvas Scroll Scrubbing) -->
     <section class="pro-hero" id="heroScrubSection">
-      <!-- 비디오 대신 캔버스 삽입 -->
-      <canvas id="heroScrubCanvas" class="hero-bg-canvas"></canvas>
+      <!-- 캔버스 오버스캔 워터마크 크롭 클리핑 컨테이너 -->
+      <div class="hero-canvas-wrapper">
+        <canvas id="heroScrubCanvas" class="hero-bg-canvas"></canvas>
+      </div>
       <div id="srLiveStatus" class="sr-only" aria-live="polite" aria-atomic="true">누리호 발사 대기 중입니다.</div>
       <div class="hero-bg-overlay"></div>
 

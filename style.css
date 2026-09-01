@@ -299,6 +299,17 @@ body.theme-default {
   align-items: flex-start;
 }
 
+.hero-canvas-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .hero-bg-canvas {
   position: absolute;
   top: 0;
@@ -308,6 +319,8 @@ body.theme-default {
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
+  transform: scale(1.06);
+  transform-origin: center center;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   filter: contrast(1.15) brightness(1.05) saturate(1.05);
@@ -3756,6 +3769,8 @@ body.theme-kids {
   height: 100vh;
   object-fit: cover;
   z-index: 1;
+  transform: scale(1.06);
+  transform-origin: center center;
   filter: contrast(1.12) brightness(1.03) saturate(1.08);
   /* 화염과 동체의 대비/선명도 강화 */
 }
