@@ -475,11 +475,11 @@
             <span class="sec-code">// LATEST_ARCHIVE</span>
           </div>
           <div class="news-tabs">
-            <button class="tab-btn active">공지사항</button>
-            <button class="tab-btn">보도자료</button>
-            <button class="tab-btn">채용안내</button>
+            <button class="tab-btn active" onclick="switchNewsTab('notice', this)">공지사항</button>
+            <button class="tab-btn" onclick="switchNewsTab('press', this)">보도자료</button>
+            <button class="tab-btn" onclick="switchNewsTab('recruit', this)">채용안내</button>
           </div>
-          <ul class="news-list">
+          <ul class="news-list" id="newsListContainer">
             <li>
               <span class="news-text">[공고] 2026년도 차세대 다목적 정지궤도 위성 지상체 개발 공모</span>
               <span class="news-date">2026.08.28</span>

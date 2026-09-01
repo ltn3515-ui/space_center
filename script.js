@@ -2127,3 +2127,48 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
+
+// ==========================================
+// KARI NEWSROOM TAB CONTROLLER
+// ==========================================
+const kariNewsData = {
+  notice: [
+    { title: "[공고] 2026년도 차세대 다목적 정지궤도 위성 지상체 개발 공모", date: "2026.08.28" },
+    { title: "국가연구소 보유 미래 모빌리티 특허 기술이전 안내 설명회", date: "2026.08.15" },
+    { title: "한국항공우주연구원 개방형 우주 데이터 활용 공모전 본선 결과", date: "2026.08.10" },
+    { title: "대덕특구 산학연동 연구장비 공동활용 지원사업 마감 안내", date: "2026.08.05" }
+  ],
+  press: [
+    { title: "[보도자료] 누리호 4차 발사용 75톤급 기체 종합 연소시험 성공 완료", date: "2026.08.26" },
+    { title: "[보도자료] 다누리 달 궤도선, 달 뒷면 고해상도 지형 데이터 추가 공개", date: "2026.08.18" },
+    { title: "[보도자료] KARI-우주항공청, 차세대 중형위성 3호 탑재체 최종 점검 완료", date: "2026.08.08" },
+    { title: "[보도자료] 한국형 위성항법시스템(KPS) 지상국 인프라 기공식 개최", date: "2026.07.29" }
+  ],
+  recruit: [
+    { title: "[채용] 2026년도 하반기 KARI 정규직 연구원 및 정규직 기술원 공개채용", date: "2026.08.25" },
+    { title: "[채용] 우주발사체연구소 전문임기제 연구원 채용 공고", date: "2026.08.14" },
+    { title: "[채용] 위성우주탐사시험센터 포스닥(Post-Doc) 신규 연구원 모집", date: "2026.08.02" },
+    { title: "[채용] 2026년도 KARI 체험형 청년인턴 모집 공고", date: "2026.07.20" }
+  ]
+};
+
+window.switchNewsTab = function(category, btnElement) {
+  const tabBtns = document.querySelectorAll('.news-tabs .tab-btn');
+  tabBtns.forEach(btn => btn.classList.remove('active'));
+  if (btnElement) btnElement.classList.add('active');
+
+  const container = document.getElementById('newsListContainer');
+  if (!container || !kariNewsData[category]) return;
+
+  container.style.opacity = '0';
+  setTimeout(() => {
+    const listHtml = kariNewsData[category].map(item => `
+      <li>
+        <span class="news-text">${item.title}</span>
+        <span class="news-date">${item.date}</span>
+      </li>
+    `).join('');
+    container.innerHTML = listHtml;
+    container.style.opacity = '1';
+  }, 150);
+};
