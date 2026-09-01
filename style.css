@@ -6344,28 +6344,32 @@ body.a11y-high-contrast button {
 .hero-compass-hud,
 #heroCompassHud {
   position: absolute !important;
-  right: 45px !important;
-  bottom: 55px !important;
-  z-index: 50 !important;
+  right: 35px !important;
+  bottom: 45px !important;
+  z-index: 60 !important;
   display: flex !important;
+  flex-direction: column !important; /* 세로 정렬로 변경 */
   align-items: center !important;
-  gap: 12px !important;
-  padding: 12px 18px !important;
-  background: rgba(8, 14, 28, 0.95) !important;
-  border: 1.5px solid rgba(0, 242, 254, 0.4) !important;
-  border-radius: 12px !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 170px !important;
+  min-height: 150px !important; /* 높이를 확보하여 상하 워터마크 완전 차폐 */
+  padding: 16px 12px !important;
+  background: rgba(6, 11, 24, 0.96) !important; /* 100%에 가까운 불투명 암실 배경 */
+  border: 1.5px solid rgba(0, 242, 254, 0.45) !important;
+  border-radius: 16px !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 242, 254, 0.2) !important;
-  width: 220px !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 242, 254, 0.2) !important;
   box-sizing: border-box !important;
   pointer-events: auto !important;
 }
 
 .compass-circle {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 52px !important;
+  height: 52px !important;
+  margin-bottom: 8px !important;
   border-radius: 50%;
   border: 1.5px dashed #00f2fe;
   display: flex;
@@ -6408,7 +6412,8 @@ body.a11y-high-contrast button {
 .compass-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 3px;
   overflow: hidden;
 }
 
