@@ -67,7 +67,7 @@
             <span onclick="switchTheme('kids')" class="clickable">키즈모드 전환 🎈</span>
           </div>
           <button class="a11y-tool-btn" onclick="toggleA11yMenu()" aria-label="접근성 도구 및 텍스트 대체 설명 보기">접근성 ♿</button>
-          <div class="hamburger" onclick="toggleSitemapModal()">☰</div>
+          <div class="hamburger" id="menuToggleBtn" onclick="toggleAllMenuOverlay()" aria-label="전체메뉴 사이트맵 열기" role="button" tabindex="0">☰</div>
         </div>
       </div>
 
@@ -1329,6 +1329,113 @@
       </div>
       <div class="modal-content">
         <p id="stageModalBodyText" class="modal-desc-body"></p>
+      </div>
+    </div>
+  <!-- ================= [KARI 2-DEPTH FULL SITEMAP MEGA OVERLAY] ================= -->
+  <div class="all-menu-overlay" id="allMenuOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="전체메뉴 사이트맵">
+    <div class="all-menu-backdrop" id="allMenuBackdrop" onclick="closeAllMenuOverlay()"></div>
+    <div class="all-menu-container">
+      <!-- 상단 헤더 영역 -->
+      <div class="all-menu-header">
+        <div class="all-menu-brand">
+          <span class="hud-sub-code">// SYSTEM SITEMAP NAVIGATION</span>
+          <h2>KARI 전체 서비스 메뉴</h2>
+        </div>
+        <button type="button" class="all-menu-close-btn" id="allMenuCloseBtn" onclick="closeAllMenuOverlay()" aria-label="전체메뉴 닫기">
+          <span class="close-icon">✕</span>
+          <span class="close-text">ESC / CLOSE</span>
+        </button>
+      </div>
+
+      <!-- 7대 메뉴 그리드 영역 -->
+      <div class="all-menu-grid">
+        <!-- 1. KARI소개 -->
+        <div class="menu-col">
+          <h3 class="col-title"><span class="col-num">01</span> KARI소개</h3>
+          <ul class="sub-menu-list">
+            <li><a href="#about" onclick="closeAllMenuOverlay()">원장 인사말</a></li>
+            <li><a href="#about-vision" onclick="closeAllMenuOverlay()">비전 및 임무</a></li>
+            <li><a href="#about-history" onclick="closeAllMenuOverlay()">연구원 연혁</a></li>
+            <li><a href="#about-facility" onclick="closeAllMenuOverlay()">조직도</a></li>
+            <li><a href="#about-location" onclick="closeAllMenuOverlay()">오시는 길</a></li>
+          </ul>
+        </div>
+
+        <!-- 2. 연구개발 -->
+        <div class="menu-col highlight">
+          <h3 class="col-title"><span class="col-num">02</span> 연구개발</h3>
+          <ul class="sub-menu-list">
+            <li><a href="#rd-rocket" onclick="closeAllMenuOverlay()">우주발사체 (누리호)</a></li>
+            <li><a href="#bento-satellite" onclick="closeAllMenuOverlay()">인공위성 시스템</a></li>
+            <li><a href="#rd-space" onclick="closeAllMenuOverlay()">우주탐사 (다누리)</a></li>
+            <li><a href="#rd-aero" onclick="closeAllMenuOverlay()">항공기 & AAM</a></li>
+            <li><a href="#rd-kps" onclick="closeAllMenuOverlay()">한국형 위성항법 (KPS)</a></li>
+          </ul>
+        </div>
+
+        <!-- 3. 뉴스룸 -->
+        <div class="menu-col">
+          <h3 class="col-title"><span class="col-num">03</span> 뉴스룸</h3>
+          <ul class="sub-menu-list">
+            <li><a href="#news-notice" onclick="closeAllMenuOverlay()">공지사항</a></li>
+            <li><a href="#news-press" onclick="closeAllMenuOverlay()">보도자료</a></li>
+            <li><a href="#news-recruit" onclick="closeAllMenuOverlay()">채용공고</a></li>
+            <li><a href="#news-story" onclick="closeAllMenuOverlay()">연구성과 브리핑</a></li>
+          </ul>
+        </div>
+
+        <!-- 4. KARI+ -->
+        <div class="menu-col">
+          <h3 class="col-title"><span class="col-num">04</span> KARI+</h3>
+          <ul class="sub-menu-list">
+            <li><a href="#kariplus" onclick="closeAllMenuOverlay()">우주기술 스토리</a></li>
+            <li><a href="#kariplus" onclick="closeAllMenuOverlay()">KARI 공식 웹진</a></li>
+            <li><a href="#kariplus" onclick="closeAllMenuOverlay()">영상·사진 갤러리</a></li>
+            <li><a href="#kariplus" onclick="closeAllMenuOverlay()">우주 e-도서관</a></li>
+          </ul>
+        </div>
+
+        <!-- 5. 기술사업화 -->
+        <div class="menu-col">
+          <h3 class="col-title"><span class="col-num">05</span> 기술사업화</h3>
+          <ul class="sub-menu-list">
+            <li><a href="#tech" onclick="closeAllMenuOverlay()">우주기술 이전안내</a></li>
+            <li><a href="#tech" onclick="closeAllMenuOverlay()">중소기업 패밀리지원</a></li>
+            <li><a href="#tech" onclick="closeAllMenuOverlay()">보유 특허 검색</a></li>
+          </ul>
+        </div>
+
+        <!-- 6. OPEN KARI -->
+        <div class="menu-col">
+          <h3 class="col-title"><span class="col-num">06</span> OPEN KARI</h3>
+          <ul class="sub-menu-list">
+            <li><a href="#open" onclick="closeAllMenuOverlay()">정보공개 청구</a></li>
+            <li><a href="#open" onclick="closeAllMenuOverlay()">경영공시 (ALIO)</a></li>
+            <li><a href="#open" onclick="closeAllMenuOverlay()">청렴·윤리 마당</a></li>
+            <li><a href="#open" onclick="closeAllMenuOverlay()">고객참여마당</a></li>
+          </ul>
+        </div>
+
+        <!-- 7. 우주과학관 -->
+        <div class="menu-col">
+          <h3 class="col-title"><span class="col-num">07</span> 우주과학관</h3>
+          <ul class="sub-menu-list">
+            <li><a href="#museum" onclick="closeAllMenuOverlay()">관람 및 견학 안내</a></li>
+            <li><a href="#museum-program" onclick="closeAllMenuOverlay()">우주체험 교육</a></li>
+            <li><a href="#museum" onclick="closeAllMenuOverlay()">온라인 사전예약</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 하단 유틸리티 링크 바 -->
+      <div class="all-menu-footer">
+        <div class="quick-flags">
+          <a href="#" onclick="closeAllMenuOverlay()">개인정보처리방침</a>
+          <a href="#" onclick="closeAllMenuOverlay()">이용약관</a>
+          <a href="#" onclick="closeAllMenuOverlay()">이메일무단수집거부</a>
+          <a href="#" onclick="closeAllMenuOverlay()">웹접근성정책</a>
+        </div>
+        <span class="telemetry-info">SYSTEM STATUS // ALL SITEMAP LINKS OPERATIONAL</span>
       </div>
     </div>
   </div>

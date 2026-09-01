@@ -2064,3 +2064,65 @@ window.launchKidsRocket = function() {
     isKidsRocketLaunching = false;
   }, 3500);
 };
+
+// ==========================================
+// KARI 2-DEPTH FULL SITEMAP OVERLAY CONTROLLER
+// ==========================================
+let allMenuLastFocusedElement = null;
+
+window.toggleAllMenuOverlay = function() {
+  const overlay = document.getElementById('allMenuOverlay');
+  if (!overlay) return;
+
+  if (overlay.classList.contains('is-open')) {
+    closeAllMenuOverlay();
+  } else {
+    openAllMenuOverlay();
+  }
+};
+
+window.openAllMenuOverlay = function() {
+  const overlay = document.getElementById('allMenuOverlay');
+  if (!overlay) return;
+
+  allMenuLastFocusedElement = document.activeElement;
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  // 첫 번째 포커스 가능 요소로 접근성 초점 이동
+  const firstFocusable = overlay.querySelector('.all-menu-close-btn, .sub-menu-list a');
+  if (firstFocusable) {
+    setTimeout(() => firstFocusable.focus(), 80);
+  }
+};
+
+window.closeAllMenuOverlay = function() {
+  const overlay = document.getElementById('allMenuOverlay');
+  if (!overlay) return;
+
+  overlay.classList.remove('is-open');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+
+  if (allMenuLastFocusedElement && typeof allMenuLastFocusedElement.focus === 'function') {
+    allMenuLastFocusedElement.focus();
+  } else {
+    const hamburger = document.getElementById('menuToggleBtn');
+    if (hamburger) hamburger.focus();
+  }
+};
+
+// 기존 햄버거/사이트맵 호출 호환성 유지
+window.toggleSitemapModal = function() {
+  window.toggleAllMenuOverlay();
+};
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const overlay = document.getElementById('allMenuOverlay');
+    if (overlay && overlay.classList.contains('is-open')) {
+      closeAllMenuOverlay();
+    }
+  }
+});
