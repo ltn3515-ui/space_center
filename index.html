@@ -162,17 +162,19 @@
       <div id="srLiveStatus" class="sr-only" aria-live="polite" aria-atomic="true">누리호 발사 대기 중입니다.</div>
       <div class="hero-bg-overlay"></div>
 
-      <div class="hero-content">
-        <h1 class="hero-title">LIFTOFF<br />KOREA</h1>
-        <h3 class="hero-subtitle">누리호 (KSLV-II)</h3>
-        <p class="hero-desc">
-          대한민국 독자 기술로 개발된 3단형 우주발사체 누리호입니다.
-          아래로 스크롤하여 75톤급 엔진 점화 및 발사 시퀀스를 직접 제어해 보세요.
-        </p>
-        <div class="hero-telemetry-hud">
-          <div class="tel-item"><span class="t-lbl">STATUS:</span> <span class="t-val" id="heroStatusVal">READY TO LAUNCH</span></div>
-          <div class="tel-item"><span class="t-lbl">ALTITUDE:</span> <span class="t-val" id="heroAltVal">0.0 KM</span></div>
-          <div class="tel-item"><span class="t-lbl">VELOCITY:</span> <span class="t-val" id="heroVelVal">0.0 M/S</span></div>
+      <div class="hero-container-inner">
+        <div class="hero-content">
+          <h1 class="hero-title">LIFTOFF<br />KOREA</h1>
+          <h3 class="hero-subtitle">누리호 (KSLV-II)</h3>
+          <p class="hero-desc">
+            대한민국 독자 기술로 개발된 3단형 우주발사체 누리호입니다.
+            아래로 스크롤하여 75톤급 엔진 점화 및 발사 시퀀스를 직접 제어해 보세요.
+          </p>
+          <div class="hero-telemetry-hud">
+            <div class="tel-item"><span class="t-lbl">STATUS:</span> <span class="t-val" id="heroStatusVal">READY TO LAUNCH</span></div>
+            <div class="tel-item"><span class="t-lbl">ALTITUDE:</span> <span class="t-val" id="heroAltVal">0.0 KM</span></div>
+            <div class="tel-item"><span class="t-lbl">VELOCITY:</span> <span class="t-val" id="heroVelVal">0.0 M/S</span></div>
+          </div>
         </div>
       </div>
 
@@ -372,7 +374,7 @@
             <span class="gs-label">KOREA GS-01</span>
           </div>
 
-          <!-- Standard Showcase Slides (1-4, 6) -->
+          <!-- Standard Showcase Slides (1-6) -->
           <div class="showcase-slide active" data-slide="1">
             <img src="img/nuriho01.jpg" alt="발사체 Space Launch Vehicle" class="slide-bg-img" />
             <div class="slide-overlay-gradient"></div>
@@ -390,7 +392,7 @@
             <div class="slide-overlay-gradient"></div>
           </div>
           <div class="showcase-slide" data-slide="5">
-            <img src="img/satellite02.jpg" alt="위성항법 KPS Navigation System" class="slide-bg-img" />
+            <video src="img/satellite01.mp4" autoplay loop muted playsinline class="slide-bg-img" style="object-fit: cover;"></video>
             <div class="slide-overlay-gradient"></div>
           </div>
           <div class="showcase-slide" data-slide="6">
@@ -400,12 +402,14 @@
         </div>
 
         <div class="showcase-content-wrapper">
-          <!-- Neon Capsule Controls (< 5/6 ▶ >) -->
+          <!-- Neon Capsule Controls (< 1/6 ▶ 🔓 >) -->
           <div class="showcase-controls neon-capsule-controls">
             <button class="showcase-ctrl-btn" onclick="moveShowcaseSlide(-1)" title="이전">〈</button>
             <span class="showcase-counter"><strong id="showcaseCurIndex">1</strong>/6</span>
             <button class="showcase-ctrl-btn play-pause-btn" id="showcasePlayPauseBtn"
               onclick="toggleShowcaseAutoPlay()" title="정지/재생">▶</button>
+            <button class="showcase-ctrl-btn lock-btn" id="showcaseLockBtn"
+              onclick="toggleShowcaseLock()" title="잠금 해제/설정" style="color: #00f5d4;">🔓</button>
             <button class="showcase-ctrl-btn" onclick="moveShowcaseSlide(1)" title="다음">〉</button>
           </div>
 

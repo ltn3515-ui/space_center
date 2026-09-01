@@ -528,9 +528,187 @@ function finishRocketAssembly() {
 }
 
 // ==========================================
+// KARI Official R&D Showcase Carousel Controller (6 Slides)
+// ==========================================
+const showcaseData = [
+  {
+    slideNum: 1,
+    titleKo: "발사체",
+    titleEn: "Space Launch Vehicle",
+    desc: "한국항공우주연구원은 KSR-I(1993), KSR-II(1998), KSR-III(2002)을 통해 로켓 설계 및 제작 능력을 확보하였으며, 러시아와 국제협력으로 나로호 개발에 성공하여 우주발사체 기술과 경험을 축적했다. 이를 토대로 1.5톤급 실용위성을 발사할 수 있는 3단형 한국형발사체 누리호를 독자 개발하여, 2027년까지 반복 발사와 기술 민간 이전을 추진할 계획이며, 2032년 달 착륙선을 발사할 차세대발사체를 개발중에 있다.",
+    is3dMode: false
+  },
+  {
+    slideNum: 2,
+    titleKo: "인공위성",
+    titleEn: "Satellite System",
+    desc: "1992년 우리별 1호 발사를 시작으로 아리랑 위성, 천리안 위성 등 고성능 저궤도 및 정지궤도 위성을 독자 개발하여 지구관측, 기상·해양 관측, 우주환경 관측 등 다양한 국가적 임무를 성공적으로 수행하고 있습니다. 서브미터급 초고해상도 광학 탑재체와 합성개구레이더(SAR) 기술을 바탕으로 세계적 수준의 위성 개발 기술력을 보유하고 있습니다.",
+    is3dMode: false
+  },
+  {
+    slideNum: 3,
+    titleKo: "우주탐사",
+    titleEn: "Deep Space Exploration",
+    desc: "대한민국 최초의 달 궤도선 다누리(KPLO)의 성공적 발사를 시작으로 심우주 통신, 항법, 임무 설계 기술을 성공적으로 확보하였습니다. 2032년 달 착륙선 독자 발사 및 표면 탐사를 목표로 추진 중이며, 향후 화성 탐사선 및 소행성 탐사까지 대한민국 우주 탐사 영역을 심우주로 지속 확장해 나가고 있습니다.",
+    is3dMode: false
+  },
+  {
+    slideNum: 4,
+    titleKo: "항공기 & AAM",
+    titleEn: "Aviation Technology",
+    desc: "친환경 자율비행 미래 항공 모빌리티(AAM), 수직이착륙(VTOL) 무인기, 스마트 UAV, 고고도 장기체공 전기동력 무인기 등 차세대 첨단 항공 기술을 연구 개발하고 있습니다. 미래 도심 교통 체계의 혁신과 대한민국 항공산업의 글로벌 기술 경쟁력 강화를 선도하고 있습니다.",
+    is3dMode: false
+  },
+  {
+    slideNum: 5,
+    titleKo: "우주항법",
+    titleEn: "KPS Navigation System",
+    desc: "한국형 위성항법시스템(KPS)은 한반도 및 인근 지역에 초정밀 위치·항법·시각(PNT) 정보를 제공하는 국가 초정밀 우주 인프라 구축 사업입니다. 자율주행, 도심항공교통(UAM), 정밀 농업, 입체 모빌리티 등 차세대 초연결 신산업의 핵심 기반 기술로 작동합니다.",
+    is3dMode: true
+  },
+  {
+    slideNum: 6,
+    titleKo: "기술사업화 & 국가 인프라",
+    titleEn: "Tech Transfer & Infra",
+    desc: "한국항공우주연구원이 보유한 첨단 우주항공 연구 성과와 특허 기술의 민간 이전, 산학연 공동 연구개발 지원, 나로우주센터 등 국가 시험 인프라의 개방을 통해 국내 우주항공 산업 생태계를 육성하고, 민간 주도의 뉴 스페이스(New Space) 시대를 실현하고 있습니다.",
+    is3dMode: false
+  }
+];
+
+let currentShowcaseIdx = 0;
+let showcaseAutoPlayTimer = null;
+let isShowcaseAutoPlaying = true;
+let isShowcaseLocked = false;
+
+function updateShowcaseSlide() {
+  const slides = document.querySelectorAll('.showcase-slide');
+  const counterEl = document.getElementById('showcaseCurIndex');
+  const hudContent = document.getElementById('hudCardContent');
+  const section = document.querySelector('.kari-showcase-section');
+  const cinematicVideo = document.getElementById('kps-cinematic-video');
+
+  if (!slides.length) return;
+
+  const data = showcaseData[currentShowcaseIdx];
+  if (!data) return;
+
+  slides.forEach((slide, i) => {
+    if (i === currentShowcaseIdx) {
+      slide.classList.add('active');
+      const slideVid = slide.querySelector('video');
+      if (slideVid) slideVid.play().catch(() => {});
+    } else {
+      slide.classList.remove('active');
+    }
+  });
+
+  if (counterEl) {
+    counterEl.textContent = data.slideNum;
+  }
+
+  if (hudContent) {
+    hudContent.style.opacity = '0';
+    hudContent.style.transform = 'translateY(6px)';
+    hudContent.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+
+    setTimeout(() => {
+      hudContent.innerHTML = `
+        <h3 class="hud-title">
+          <span class="hud-ko">${data.titleKo}</span>
+          <span class="hud-en">${data.titleEn}</span>
+        </h3>
+        <p class="hud-desc">${data.desc}</p>
+      `;
+      hudContent.style.opacity = '1';
+      hudContent.style.transform = 'translateY(0)';
+    }, 200);
+  }
+
+  if (section) {
+    if (data.is3dMode) {
+      section.classList.add('mode-3d');
+      if (cinematicVideo) {
+        cinematicVideo.play().catch(() => {});
+      }
+    } else {
+      section.classList.remove('mode-3d');
+    }
+  }
+}
+
+window.moveShowcaseSlide = function(dir) {
+  if (isShowcaseLocked) return;
+
+  currentShowcaseIdx = (currentShowcaseIdx + dir + showcaseData.length) % showcaseData.length;
+  updateShowcaseSlide();
+
+  if (isShowcaseAutoPlaying) {
+    resetShowcaseAutoPlay();
+  }
+};
+
+window.toggleShowcaseAutoPlay = function() {
+  const btn = document.getElementById('showcasePlayPauseBtn');
+  isShowcaseAutoPlaying = !isShowcaseAutoPlaying;
+
+  if (isShowcaseAutoPlaying) {
+    if (btn) btn.textContent = '▶';
+    startShowcaseAutoPlay();
+  } else {
+    if (btn) btn.textContent = '⏸';
+    stopShowcaseAutoPlay();
+  }
+};
+
+window.toggleShowcaseLock = function() {
+  const btn = document.getElementById('showcaseLockBtn');
+  isShowcaseLocked = !isShowcaseLocked;
+
+  if (btn) {
+    if (isShowcaseLocked) {
+      btn.textContent = '🔒';
+      btn.title = '슬라이드 잠금 상태 (클릭 시 해제)';
+      btn.style.color = '#ff4757';
+      stopShowcaseAutoPlay();
+    } else {
+      btn.textContent = '🔓';
+      btn.title = '슬라이드 잠금 해제 상태 (클릭 시 잠금)';
+      btn.style.color = '#00f5d4';
+      if (isShowcaseAutoPlaying) {
+        startShowcaseAutoPlay();
+      }
+    }
+  }
+};
+
+function startShowcaseAutoPlay() {
+  stopShowcaseAutoPlay();
+  if (!isShowcaseLocked) {
+    showcaseAutoPlayTimer = setInterval(() => {
+      currentShowcaseIdx = (currentShowcaseIdx + 1) % showcaseData.length;
+      updateShowcaseSlide();
+    }, 4500);
+  }
+}
+
+function stopShowcaseAutoPlay() {
+  if (showcaseAutoPlayTimer) {
+    clearInterval(showcaseAutoPlayTimer);
+    showcaseAutoPlayTimer = null;
+  }
+}
+
+function resetShowcaseAutoPlay() {
+  stopShowcaseAutoPlay();
+  startShowcaseAutoPlay();
+}
+
+// ==========================================
 // Hero Canvas Scroll Scrubbing & Hotspot 연동
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+  updateShowcaseSlide();
+  startShowcaseAutoPlay();
   initHeroCanvasScrubber();
   initBentoCardInteractions();
   initKidsStarTrail();
@@ -553,15 +731,11 @@ function initHeroCanvasScrubber() {
   const playhead = { frame: 0 };
 
   function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.max(window.devicePixelRatio || 1, 2);
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
     canvas.style.width = '100vw';
     canvas.style.height = '100vh';
-
-    ctx.scale(dpr, dpr);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
 
     renderFrame(playhead.frame);
   }
@@ -580,27 +754,33 @@ function initHeroCanvasScrubber() {
     if (!img || !img.complete) img = images[0];
     if (!img || !img.complete) return;
 
+    const dpr = Math.max(window.devicePixelRatio || 1, 2);
     const logicalWidth = window.innerWidth;
     const logicalHeight = window.innerHeight;
-    ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+
+    // 전체 해상도 버퍼 초기화
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const canvasRatio = logicalWidth / logicalHeight;
     const imgRatio = img.width / img.height;
     let drawW, drawH, drawX, drawY;
 
     if (canvasRatio > imgRatio) {
-      drawW = logicalWidth * 1.06;
-      drawH = (logicalWidth / imgRatio) * 1.06;
-      drawX = (logicalWidth - drawW) / 2;
-      drawY = (logicalHeight - drawH) / 2;
+      drawW = logicalWidth;
+      drawH = logicalWidth / imgRatio;
     } else {
-      drawW = (logicalHeight * imgRatio) * 1.06;
-      drawH = logicalHeight * 1.06;
-      drawX = (logicalWidth - drawW) / 2;
-      drawY = (logicalHeight - drawH) / 2;
+      drawW = logicalHeight * imgRatio;
+      drawH = logicalHeight;
     }
+    drawX = (logicalWidth - drawW) / 2;
+    drawY = (logicalHeight - drawH) / 2;
 
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, drawX, drawY, drawW, drawH);
+    ctx.restore();
   }
 
   let loadedCount = 0;
@@ -721,7 +901,7 @@ function initBentoCardInteractions() {
 
     card.addEventListener('mouseleave', () => {
       card.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s, box-shadow 0.3s';
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      card.style.transform = '';
     });
   });
 }
@@ -820,10 +1000,8 @@ function initKidsStarTrail() {
 // RESEARCH FIELDS 벤토 그리드 좌우 슬라이드-인 GSAP 애니메이션
 // ==========================================
 function initBentoSlideIn() {
-  // GSAP 또는 ScrollTrigger 미로드 환경 대비
   if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-  // ScrollTrigger 플러그인 등록
   gsap.registerPlugin(ScrollTrigger);
 
   const section = document.getElementById('researchSection');
@@ -833,47 +1011,38 @@ function initBentoSlideIn() {
   const mainCard = section.querySelector('.bento-main-card');
   const subCards = section.querySelectorAll('.bento-sub-card');
 
-  // 타겟 요소가 하나도 없으면 중단
   if (!header && !mainCard && !subCards.length) return;
 
   const bentoTL = gsap.timeline({
     scrollTrigger: {
       trigger: '#researchSection',
-      start: 'top 75%',
+      start: 'top 80%',
       toggleActions: 'play none none none',
-      once: true // 1회만 실행 (스크롤 역방향 재실행 방지)
+      once: true
     }
   });
 
-  // 1. 헤더 드롭다운
   if (header) {
-    bentoTL.from(header, {
-      y: -24,
-      opacity: 0,
-      duration: 0.6,
-      ease: 'power2.out'
-    });
+    bentoTL.fromTo(header,
+      { y: -20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', clearProps: 'transform,opacity' }
+    );
   }
 
-  // 2. 좌측 대형 카드: 왼쪽에서 슬라이드 인
   if (mainCard) {
-    bentoTL.from(mainCard, {
-      x: -90,
-      opacity: 0,
-      duration: 0.9,
-      ease: 'power3.out'
-    }, header ? '-=0.3' : 0);
+    bentoTL.fromTo(mainCard,
+      { x: -40, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' },
+      header ? '-=0.2' : 0
+    );
   }
 
-  // 3. 우측 4개 서브 카드: 오른쪽에서 Stagger 슬라이드 인
   if (subCards.length) {
-    bentoTL.from(subCards, {
-      x: 90,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.12,
-      ease: 'power3.out'
-    }, mainCard ? '-=0.7' : 0);
+    bentoTL.fromTo(subCards,
+      { x: 40, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out', clearProps: 'transform,opacity' },
+      mainCard ? '-=0.5' : 0
+    );
   }
 }
 
@@ -1148,7 +1317,6 @@ function renderSatFrame(index) {
   const ctx = canvas.getContext('2d');
   let img = satImages[index];
 
-  // 프리로드가 완료되지 않은 경우에 대한 Fallback
   if (!img || !img.complete) {
     for (let i = index - 1; i >= 0; i--) {
       if (satImages[i] && satImages[i].complete) {
@@ -1162,41 +1330,40 @@ function renderSatFrame(index) {
   }
   if (!img || !img.complete) return;
 
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = Math.max(window.devicePixelRatio || 1, 2);
   const container = canvas.parentElement;
   const logicalWidth = container.clientWidth || window.innerWidth;
   const logicalHeight = container.clientHeight || window.innerHeight;
 
-  // 캔버스 크기 스케일링 설정
   if (canvas.width !== logicalWidth * dpr || canvas.height !== logicalHeight * dpr) {
     canvas.width = logicalWidth * dpr;
     canvas.height = logicalHeight * dpr;
     canvas.style.width = logicalWidth + 'px';
     canvas.style.height = logicalHeight + 'px';
-    ctx.scale(dpr, dpr);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
   }
 
-  ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const canvasRatio = logicalWidth / logicalHeight;
   const imgRatio = img.width / img.height;
   let drawW, drawH, drawX, drawY;
 
   if (canvasRatio > imgRatio) {
-    drawW = logicalWidth * 1.06;
-    drawH = (logicalWidth / imgRatio) * 1.06;
-    drawX = (logicalWidth - drawW) / 2;
-    drawY = (logicalHeight - drawH) / 2;
+    drawW = logicalWidth;
+    drawH = logicalWidth / imgRatio;
   } else {
-    drawW = (logicalHeight * imgRatio) * 1.06;
-    drawH = logicalHeight * 1.06;
-    drawX = (logicalWidth - drawW) / 2;
-    drawY = (logicalHeight - drawH) / 2;
+    drawW = logicalHeight * imgRatio;
+    drawH = logicalHeight;
   }
+  drawX = (logicalWidth - drawW) / 2;
+  drawY = (logicalHeight - drawH) / 2;
 
+  ctx.save();
+  ctx.scale(dpr, dpr);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, drawX, drawY, drawW, drawH);
+  ctx.restore();
 }
 
 /**
@@ -1739,3 +1906,71 @@ if (window.speechSynthesis) {
     window.speechSynthesis.getVoices();
   };
 }
+
+// 4. 키즈 히어로 로켓 발사 (출발하기 버튼 연동)
+let isKidsRocketLaunching = false;
+window.launchKidsRocket = function() {
+  if (isKidsRocketLaunching) return;
+
+  const heroFrame = document.getElementById('kidsHeroFrame');
+  const rocketWrapper = document.getElementById('kidsRocketWrapper');
+  const btn = document.getElementById('kidsLaunchBtn');
+
+  if (!heroFrame || !rocketWrapper) return;
+
+  isKidsRocketLaunching = true;
+
+  // 1) 발사 준비 진동 (shaking) 및 버튼 상태 변경
+  rocketWrapper.classList.add('shaking');
+
+  if (btn) {
+    btn.classList.add('clicked');
+    btn.disabled = true;
+    btn.innerHTML = '카운트다운... 3! 2! 1! 🚀';
+    btn.style.opacity = '0.85';
+  }
+
+  // 음성 TTS 안내
+  if ('speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+      const launchAudio = new SpeechSynthesisUtterance("3, 2, 1, 카운트다운! 로켓 발사!");
+      launchAudio.lang = 'ko-KR';
+      launchAudio.rate = 1.0;
+      launchAudio.pitch = 1.2;
+
+      const voices = window.speechSynthesis.getVoices();
+      const koVoice = voices.find(v => v.lang.startsWith('ko'));
+      if (koVoice) launchAudio.voice = koVoice;
+
+      window.speechSynthesis.speak(launchAudio);
+    } catch(e) {
+      console.warn("Launch TTS error:", e);
+    }
+  }
+
+  // 2) 0.5초 후 화염 점화 및 상공 수직 발사 (launching)
+  setTimeout(() => {
+    rocketWrapper.classList.remove('shaking');
+    heroFrame.classList.add('launching');
+    rocketWrapper.classList.add('launching');
+
+    if (btn) {
+      btn.innerHTML = '우주로 출발 중! 🌌🚀';
+    }
+  }, 500);
+
+  // 3) 3.5초 후 발사 완료 및 발사대 복귀 리셋
+  setTimeout(() => {
+    heroFrame.classList.remove('launching');
+    rocketWrapper.classList.remove('launching');
+
+    if (btn) {
+      btn.classList.remove('clicked');
+      btn.disabled = false;
+      btn.innerHTML = '다시 출발하기 🚀';
+      btn.style.opacity = '1';
+    }
+    isKidsRocketLaunching = false;
+  }, 3500);
+};
