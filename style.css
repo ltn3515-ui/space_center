@@ -3671,9 +3671,9 @@ body.theme-kids {
   width: 100vw;
   height: 100vh;
   background-color: #03050c;
-  z-index: 99999;
+  z-index: 999999 !important;
   /* 화면 최상단 고정 */
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   overflow: hidden;

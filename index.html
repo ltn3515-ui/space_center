@@ -20,6 +20,21 @@
 
 <body class="theme-default">
 
+  <!-- Intro Number Ticker Preloader Screen -->
+  <div id="introPreloader" class="intro-preloader">
+    <div class="intro-bg-grid"></div>
+    <div class="intro-content">
+      <div class="intro-tag">KARI MISSION CONTROL SYSTEM INITIALIZING</div>
+      <div class="intro-ticker-wrap">
+        <span id="numberTicker" class="ticker-number">0</span><span class="ticker-unit">%</span>
+      </div>
+      <div class="intro-progress-bar">
+        <div id="introProgressFill" class="progress-fill"></div>
+      </div>
+      <div class="intro-status-text" id="introStatusText">CALIBRATING ORBITAL TELEMETRY...</div>
+    </div>
+  </div>
+
   <!-- Custom SF HUD Target Cursor -->
   <div class="custom-hud-cursor" id="hudCursorDot"></div>
   <div class="custom-hud-ring" id="hudCursorRing">
@@ -1442,19 +1457,4 @@
 
   <script src="script.js?v=2.0"></script>
 </body>
-<!-- Intro Number Ticker Preloader Screen -->
-<div id="introPreloader" class="intro-preloader">
-  <div class="intro-bg-grid"></div>
-  <div class="intro-content">
-    <div class="intro-tag">KARI MISSION CONTROL SYSTEM INITIALIZING</div>
-    <div class="intro-ticker-wrap">
-      <span id="numberTicker" class="ticker-number">0</span><span class="ticker-unit">%</span>
-    </div>
-    <div class="intro-progress-bar">
-      <div id="introProgressFill" class="progress-fill"></div>
-    </div>
-    <div class="intro-status-text" id="introStatusText">CALIBRATING ORBITAL TELEMETRY...</div>
-  </div>
-</div>
-
 </html>
