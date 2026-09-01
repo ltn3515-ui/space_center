@@ -305,9 +305,9 @@ function updateChatbotTheme(theme) {
       `;
     }
   } else {
-    if (avatarImg) avatarImg.src = avatarImg.getAttribute('data-default') || 'img/robot.jpg';
-    if (dialogueText) dialogueText.innerText = "무엇을 도와드릴까요?";
-    if (actionBtn) actionBtn.innerText = "관제 AI와 대화하기 💬";
+    if (avatarImg) avatarImg.src = avatarImg.getAttribute('data-default') || 'img/researcher.jpg';
+    if (dialogueText) dialogueText.innerText = "궁금한 우주 기술이 있으신가요?";
+    if (actionBtn) actionBtn.innerText = "KARI 연구원과 대화하기 💬";
     if (chipsContainer) {
       chipsContainer.innerHTML = `
         <button class="quick-question-chip" onclick="sendQuickQuestion('🚀 누리호 75톤 엔진 구조')">🚀 누리호 75톤 엔진 구조</button>
@@ -1697,9 +1697,9 @@ window.updateChatbotTheme = function(themeName) {
     dialogueText.textContent = "안녕! 우주봇이야 🛰️";
     actionBtn.textContent = "우주 로봇이랑 대화하기 🎈";
   } else {
-    botAvatarImg.src = botAvatarImg.getAttribute('data-default') || 'img/robot.jpg';
-    dialogueText.textContent = "무엇을 도와드릴까요?";
-    actionBtn.textContent = "관제 AI와 대화하기 💬";
+    botAvatarImg.src = botAvatarImg.getAttribute('data-default') || 'img/researcher.jpg';
+    dialogueText.textContent = "궁금한 우주 기술이 있으신가요?";
+    actionBtn.textContent = "KARI 연구원과 대화하기 💬";
   }
 };
 
