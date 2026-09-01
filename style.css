@@ -1479,16 +1479,45 @@ body.theme-default {
 .footer-bottom {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding-top: 20px;
   color: #475569;
 }
 
-.wa-badge {
-  background: #1e293b;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
+.footer-cert-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wa-cert-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wa-cert-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 242, 254, 0.25);
+}
+
+.wa-cert-img {
+  height: 42px;
+  width: auto;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+  border-radius: 3px;
+  display: block;
+}
+
+.wa-cert-img:hover {
+  opacity: 1;
 }
 
 /* ==========================================================================
