@@ -5825,7 +5825,8 @@ body.kids-mode .chat-send-btn {
 }
 
 /* 키즈모드 챗봇 내부 포커스 점선 윤곽선 제거 */
-body.kids-mode .chat-modal-container :focus-visible {
+body.kids-mode .chat-modal-container :focus-visible,
+.chat-modal-container :focus-visible {
   outline: none !important;
 }
 
