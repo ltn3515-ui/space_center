@@ -1495,24 +1495,25 @@ body.theme-default {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 3px 8px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: transparent;
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .wa-cert-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 242, 254, 0.25);
+  box-shadow: 0 6px 16px rgba(0, 242, 254, 0.35);
 }
 
 .wa-cert-img {
-  height: 42px;
+  height: 48px;
   width: auto;
-  opacity: 0.85;
+  opacity: 0.92;
   transition: opacity 0.2s ease;
-  border-radius: 3px;
+  border-radius: 8px;
   display: block;
 }
 
