@@ -475,9 +475,9 @@
             <span class="sec-code">// LATEST_ARCHIVE</span>
           </div>
           <div class="news-tabs">
-            <button class="tab-btn active" onclick="switchNewsTab('notice', this)">공지사항</button>
-            <button class="tab-btn" onclick="switchNewsTab('press', this)">보도자료</button>
-            <button class="tab-btn" onclick="switchNewsTab('recruit', this)">채용안내</button>
+            <button type="button" class="tab-btn active" data-category="notice" onclick="switchNewsTab('notice', this)">공지사항</button>
+            <button type="button" class="tab-btn" data-category="press" onclick="switchNewsTab('press', this)">보도자료</button>
+            <button type="button" class="tab-btn" data-category="recruit" onclick="switchNewsTab('recruit', this)">채용안내</button>
           </div>
           <ul class="news-list" id="newsListContainer">
             <li>

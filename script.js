@@ -2155,20 +2155,39 @@ const kariNewsData = {
 window.switchNewsTab = function(category, btnElement) {
   const tabBtns = document.querySelectorAll('.news-tabs .tab-btn');
   tabBtns.forEach(btn => btn.classList.remove('active'));
-  if (btnElement) btnElement.classList.add('active');
+
+  if (btnElement) {
+    btnElement.classList.add('active');
+  } else {
+    const targetBtn = document.querySelector(`.news-tabs .tab-btn[data-category="${category}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
+  }
 
   const container = document.getElementById('newsListContainer');
   if (!container || !kariNewsData[category]) return;
 
-  container.style.opacity = '0';
-  setTimeout(() => {
-    const listHtml = kariNewsData[category].map(item => `
-      <li>
-        <span class="news-text">${item.title}</span>
-        <span class="news-date">${item.date}</span>
-      </li>
-    `).join('');
-    container.innerHTML = listHtml;
-    container.style.opacity = '1';
-  }, 150);
+  const listHtml = kariNewsData[category].map(item => `
+    <li>
+      <span class="news-text">${item.title}</span>
+      <span class="news-date">${item.date}</span>
+    </li>
+  `).join('');
+
+  container.innerHTML = listHtml;
+  container.style.opacity = '1';
 };
+
+// DOM 로드 즉시 뉴스룸 탭 버튼 클리킹 이벤트 강제 링킹
+document.addEventListener('DOMContentLoaded', () => {
+  const tabBtns = document.querySelectorAll('.news-tabs .tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const cat = this.getAttribute('data-category');
+      if (cat) {
+        window.switchNewsTab(cat, this);
+      }
+    });
+  });
+});
