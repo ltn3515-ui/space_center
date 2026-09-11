@@ -29,9 +29,9 @@
     <th>뉴스룸·관제 챗봇</th>
   </tr>
   <tr>
-    <td><img src="./docs/images/kari-liftoff.jpg" alt="누리호 발사 인터랙션 화면" width="320" /></td>
-    <td><img src="./docs/images/kari-kids.jpg" alt="KARI Kids 어린이 우주 체험 화면" width="320" /></td>
-    <td><img src="./docs/images/kari-newsroom-chatbot.jpg" alt="KARI 뉴스룸과 관제 챗봇 화면" width="320" /></td>
+    <td><img src="./kari-liftoff.jpg" alt="누리호 발사 인터랙션 화면" width="320" /></td>
+    <td><img src="./kari-kids.jpg" alt="KARI Kids 어린이 우주 체험 화면" width="320" /></td>
+    <td><img src="./kari-newsroom-chatbot.jpg" alt="KARI 뉴스룸과 관제 챗봇 화면" width="320" /></td>
   </tr>
 </table>
 
@@ -143,7 +143,7 @@ space_center/
 <details>
   <summary><strong>GitHub 저장소 구조 캡처 보기</strong></summary>
   <br />
-  <img src="./docs/images/repository-structure.png" alt="KARI GitHub 저장소 폴더 구조" width="750" />
+  <img src="./repository-structure.png" alt="KARI GitHub 저장소 폴더 구조" width="750" />
 </details>
 
 ## 🛠️ 기술 스택
