@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ltn3515-ui.github.io/space_center/sitemap.xml
